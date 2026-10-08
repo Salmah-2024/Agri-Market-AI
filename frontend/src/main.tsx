@@ -4,11 +4,14 @@ import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
 import { applyStoredTheme } from './lib/theme'
+import { LanguageProvider } from './lib/i18n'
 
 applyStoredTheme()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </StrictMode>,
 )

@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useT } from '@/lib/i18n'
 import type { ListingStatus, Order } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -44,16 +45,23 @@ export function StatCard({
   )
 }
 
-const LISTING_STATUS: Record<ListingStatus, { label: string; variant: 'success' | 'warning' | 'info' | 'muted' }> = {
-  available: { label: 'Available', variant: 'success' },
-  partially_sold: { label: 'Partly bought', variant: 'warning' },
-  sold: { label: 'Bought / Sold', variant: 'info' },
-  withdrawn: { label: 'Withdrawn', variant: 'muted' },
+const LISTING_STATUS_VARIANT: Record<ListingStatus, 'success' | 'warning' | 'info' | 'muted'> = {
+  available: 'success',
+  partially_sold: 'warning',
+  sold: 'info',
+  withdrawn: 'muted',
 }
 
 export function ListingStatusBadge({ status }: { status: ListingStatus }) {
-  const s = LISTING_STATUS[status] ?? LISTING_STATUS.available
-  return <Badge variant={s.variant}>{s.label}</Badge>
+  const t = useT()
+  const labels: Record<ListingStatus, string> = {
+    available: t('Inapatikana', 'Available'),
+    partially_sold: t('Imenunuliwa kwa sehemu', 'Partly bought'),
+    sold: t('Imenunuliwa / Imeuzwa', 'Bought / Sold'),
+    withdrawn: t('Imeondolewa', 'Withdrawn'),
+  }
+  const variant = LISTING_STATUS_VARIANT[status] ?? LISTING_STATUS_VARIANT.available
+  return <Badge variant={variant}>{labels[status] ?? labels.available}</Badge>
 }
 
 const ORDER_STATUS: Record<Order['status'], 'warning' | 'info' | 'success' | 'muted'> = {
@@ -64,18 +72,26 @@ const ORDER_STATUS: Record<Order['status'], 'warning' | 'info' | 'success' | 'mu
 }
 
 export function OrderStatusBadge({ status }: { status: Order['status'] }) {
+  const t = useT()
+  const labels: Record<Order['status'], string> = {
+    pending: t('Inasubiri', 'Pending'),
+    confirmed: t('Imethibitishwa', 'Confirmed'),
+    delivered: t('Imefikishwa', 'Delivered'),
+    cancelled: t('Imeghairiwa', 'Cancelled'),
+  }
   return (
     <Badge variant={ORDER_STATUS[status]} className="capitalize">
-      {status}
+      {labels[status]}
     </Badge>
   )
 }
 
 export function TrendBadge({ trend, pct }: { trend: 'up' | 'down' | 'stable'; pct?: number }) {
+  const t = useT()
   const map = {
-    up: { icon: TrendingUp, cls: 'text-emerald-700 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-300', label: 'Rising' },
-    down: { icon: TrendingDown, cls: 'text-rose-700 bg-rose-50 dark:bg-rose-950 dark:text-rose-300', label: 'Falling' },
-    stable: { icon: Minus, cls: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-300', label: 'Stable' },
+    up: { icon: TrendingUp, cls: 'text-emerald-700 bg-emerald-50 dark:bg-emerald-950 dark:text-emerald-300', label: t('Inapanda', 'Rising') },
+    down: { icon: TrendingDown, cls: 'text-rose-700 bg-rose-50 dark:bg-rose-950 dark:text-rose-300', label: t('Inashuka', 'Falling') },
+    stable: { icon: Minus, cls: 'text-slate-700 bg-slate-100 dark:bg-slate-800 dark:text-slate-300', label: t('Tulivu', 'Stable') },
   }[trend]
   return (
     <span className={cn('inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-medium', map.cls)}>
@@ -123,10 +139,11 @@ export function SimpleSelect({
   className?: string
   invalid?: boolean
 }) {
+  const t = useT()
   return (
     <Select value={value || undefined} onValueChange={onChange}>
       <SelectTrigger className={className} aria-invalid={invalid || undefined}>
-        <SelectValue placeholder={placeholder ?? 'Select'} />
+        <SelectValue placeholder={placeholder ?? t('Chagua', 'Select')} />
       </SelectTrigger>
       <SelectContent>
         {options.map((o) => {

@@ -29,18 +29,18 @@ def login_required(role: str | None = None):
             header = request.headers.get("Authorization", "")
             token = header[7:] if header.startswith("Bearer ") else None
             if not token:
-                return jsonify(error="Please log in."), 401
+                return jsonify(error="Tafadhali ingia."), 401
             try:
                 data = jwt.decode(token, SECRET, algorithms=["HS256"])
             except jwt.ExpiredSignatureError:
-                return jsonify(error="Session expired, please log in again."), 401
+                return jsonify(error="Muda wa kipindi umeisha, tafadhali ingia tena."), 401
             except jwt.InvalidTokenError:
-                return jsonify(error="Invalid session."), 401
+                return jsonify(error="Kipindi si sahihi."), 401
             user = get_db().users.find_one({"_id": oid(data["sub"])})
             if not user:
-                return jsonify(error="Account not found."), 401
+                return jsonify(error="Akaunti haikupatikana."), 401
             if role and user["role"] != role:
-                return jsonify(error=f"Only {role}s can do this."), 403
+                return jsonify(error=f"Ni {role} pekee wanaoweza kufanya hili."), 403
             g.user = user
             return fn(*args, **kwargs)
 

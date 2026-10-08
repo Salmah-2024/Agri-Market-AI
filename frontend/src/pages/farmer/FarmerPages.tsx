@@ -43,12 +43,15 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { useAuth } from '@/context/AuthContext'
 import { api, ApiError } from '@/lib/api'
+import { useT } from '@/lib/i18n'
+import { sw } from '@/lib/crops'
 import { dateTime, num, shortDate, tzs, unitPrice } from '@/lib/format'
 import type { Buyer, Forecast, GovPrice, Listing, Order } from '@/lib/types'
 import { useApi } from '@/lib/useApi'
 
 /* ======================= Overview ======================= */
 export function FarmerOverview() {
+  const t = useT()
   const { user } = useAuth()
   const listings = useApi<{ listings: Listing[] }>('/listings/mine')
   const orders = useApi<{ orders: Order[] }>('/orders/farmer')
@@ -68,33 +71,33 @@ export function FarmerOverview() {
   return (
     <>
       <PageHeader
-        title="Farmer dashboard"
-        description={`Overview of your crops, sales and today’s market in ${region}.`}
+        title={t('Dashibodi ya mkulima', 'Farmer dashboard')}
+        description={t(`Muhtasari wa mazao yako, mauzo na soko la leo katika ${region}.`, `Overview of your crops, sales and today’s market in ${region}.`)}
         action={
           <Button asChild>
             <Link to="/farmer/crops?new=1">
-              <Plus /> Register crop
+              <Plus /> {t('Sajili zao', 'Register crop')}
             </Link>
           </Button>
         }
       />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={Package} label="Crops in stock" value={`${num(stockKg)} kg`} hint={`${L.filter((l) => l.status !== 'sold' && l.status !== 'withdrawn').length} active listings`} />
-        <StatCard icon={CheckCircle2} label="Sold so far" value={`${num(soldKg)} kg`} tone="sky" hint={`${O.length} orders`} />
-        <StatCard icon={Wallet} label="Sales value" value={tzs(revenue)} tone="amber" />
-        <StatCard icon={ClipboardList} label="Orders to confirm" value={pending} tone="rose" hint={pending ? 'Buyers are waiting' : 'All handled'} />
+        <StatCard icon={Package} label={t('Mazao yaliyopo', 'Crops in stock')} value={`${num(stockKg)} kg`} hint={t(`matangazo ${L.filter((l) => l.status !== 'sold' && l.status !== 'withdrawn').length} yanayoendelea`, `${L.filter((l) => l.status !== 'sold' && l.status !== 'withdrawn').length} active listings`)} />
+        <StatCard icon={CheckCircle2} label={t('Yaliyouzwa hadi sasa', 'Sold so far')} value={`${num(soldKg)} kg`} tone="sky" hint={t(`maagizo ${O.length}`, `${O.length} orders`)} />
+        <StatCard icon={Wallet} label={t('Thamani ya mauzo', 'Sales value')} value={tzs(revenue)} tone="amber" />
+        <StatCard icon={ClipboardList} label={t('Maagizo ya kuthibitisha', 'Orders to confirm')} value={pending} tone="rose" hint={pending ? t('Wanunuzi wanasubiri', 'Buyers are waiting') : t('Yote yameshughulikiwa', 'All handled')} />
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <BrainCircuit className="size-5 text-primary" /> Today’s AI price forecast
+              <BrainCircuit className="size-5 text-primary" /> {t('Utabiri wa bei wa AI wa leo', 'Today’s AI price forecast')}
             </CardTitle>
-            <CardDescription>For your crops in {region} (TZS/kg)</CardDescription>
+            <CardDescription>{t(`Kwa mazao yako katika ${region} (TZS/kg)`, `For your crops in ${region} (TZS/kg)`)}</CardDescription>
             <CardAction>
               <Button variant="outline" size="sm" asChild>
-                <Link to="/farmer/predictions">Details</Link>
+                <Link to="/farmer/predictions">{t('Maelezo', 'Details')}</Link>
               </Button>
             </CardAction>
           </CardHeader>
@@ -105,12 +108,12 @@ export function FarmerOverview() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Crop</TableHead>
-                    <TableHead className="text-right">Now</TableHead>
-                    <TableHead className="text-right">Next week</TableHead>
-                    <TableHead className="text-right">In 4 weeks</TableHead>
-                    <TableHead className="text-right">Gov. price</TableHead>
-                    <TableHead>Trend</TableHead>
+                    <TableHead>{t('Zao', 'Crop')}</TableHead>
+                    <TableHead className="text-right">{t('Sasa', 'Now')}</TableHead>
+                    <TableHead className="text-right">{t('Wiki ijayo', 'Next week')}</TableHead>
+                    <TableHead className="text-right">{t('Baada ya wiki 4', 'In 4 weeks')}</TableHead>
+                    <TableHead className="text-right">{t('Bei elekezi', 'Gov. price')}</TableHead>
+                    <TableHead>{t('Mwelekeo', 'Trend')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -137,10 +140,10 @@ export function FarmerOverview() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Recent orders</CardTitle>
+            <CardTitle>{t('Maagizo ya hivi karibuni', 'Recent orders')}</CardTitle>
             <CardAction>
               <Button variant="outline" size="sm" asChild>
-                <Link to="/farmer/crops">All</Link>
+                <Link to="/farmer/crops">{t('Yote', 'All')}</Link>
               </Button>
             </CardAction>
           </CardHeader>
@@ -148,7 +151,7 @@ export function FarmerOverview() {
             {orders.loading ? (
               <LoadingRows />
             ) : !O.length ? (
-              <p className="text-sm text-muted-foreground">No orders yet. Buyers will appear here when they buy your crops.</p>
+              <p className="text-sm text-muted-foreground">{t('Bado hakuna maagizo. Wanunuzi watatokea hapa watakaponunua mazao yako.', 'No orders yet. Buyers will appear here when they buy your crops.')}</p>
             ) : (
               O.slice(0, 5).map((o) => (
                 <div key={o.id} className="flex items-center justify-between gap-3 rounded-lg border p-3">
@@ -172,9 +175,8 @@ export function FarmerOverview() {
 }
 
 /* ======================= My crops ======================= */
-const GRADES = ['Grade A', 'Grade 1', 'Grade 2', 'Grade 3', 'Ungraded']
-
 export function MyCrops() {
+  const t = useT()
   const { user } = useAuth()
   const { data, loading, error, reload } = useApi<{ listings: Listing[] }>('/listings/mine')
   const [filter, setFilter] = useState('all')
@@ -195,7 +197,7 @@ export function MyCrops() {
   const setStatus = async (l: Listing, status: string) => {
     try {
       await api(`/listings/${l.id}`, { method: 'PUT', body: { status } })
-      toast.success(status === 'sold' ? 'Marked as sold' : 'Listing updated')
+      toast.success(status === 'sold' ? t('Imewekwa kama imeuzwa', 'Marked as sold') : t('Tangazo limesasishwa', 'Listing updated'))
       reload()
     } catch (e) {
       toast.error((e as Error).message)
@@ -203,28 +205,28 @@ export function MyCrops() {
   }
   const remove = async (l: Listing) => {
     await api(`/listings/${l.id}`, { method: 'DELETE' })
-    toast.success('Listing removed')
+    toast.success(t('Tangazo limeondolewa', 'Listing removed'))
     reload()
   }
 
   return (
     <>
       <PageHeader
-        title="My crops"
-        description="Register the crops you have available and follow whether they have been bought."
+        title={t('Mazao yangu', 'My crops')}
+        description={t('Sajili mazao uliyo nayo na fuatilia kama yameshanunuliwa.', 'Register the crops you have available and follow whether they have been bought.')}
         action={
           <Button onClick={() => setEditing('new')}>
-            <Plus /> Register crop
+            <Plus /> {t('Sajili zao', 'Register crop')}
           </Button>
         }
       />
       {error && <ErrorBox message={error} />}
       <Tabs value={filter} onValueChange={setFilter} className="mb-4">
         <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="available">Not yet bought</TabsTrigger>
-          <TabsTrigger value="sold">Bought</TabsTrigger>
-          <TabsTrigger value="withdrawn">Withdrawn</TabsTrigger>
+          <TabsTrigger value="all">{t('Yote', 'All')}</TabsTrigger>
+          <TabsTrigger value="available">{t('Bado hayajanunuliwa', 'Not yet bought')}</TabsTrigger>
+          <TabsTrigger value="sold">{t('Yaliyonunuliwa', 'Bought')}</TabsTrigger>
+          <TabsTrigger value="withdrawn">{t('Yaliyoondolewa', 'Withdrawn')}</TabsTrigger>
         </TabsList>
       </Tabs>
       {loading ? (
@@ -232,11 +234,11 @@ export function MyCrops() {
       ) : !rows.length ? (
         <EmptyState
           icon={Sprout}
-          title="No crops here"
-          text="Register a crop with its quantity and price so buyers can find it."
+          title={t('Hakuna mazao hapa', 'No crops here')}
+          text={t('Sajili zao pamoja na kiasi na bei yake ili wanunuzi waweze kulipata.', 'Register a crop with its quantity and price so buyers can find it.')}
           action={
             <Button onClick={() => setEditing('new')}>
-              <Plus /> Register crop
+              <Plus /> {t('Sajili zao', 'Register crop')}
             </Button>
           }
         />
@@ -253,7 +255,7 @@ export function MyCrops() {
                     {l.variety && <span className="font-normal text-muted-foreground"> · {l.variety}</span>}
                   </CardTitle>
                   <CardDescription className="flex items-center gap-1">
-                    <MapPin className="size-3.5" /> {[l.district, l.region].filter(Boolean).join(', ')} · listed {shortDate(l.created_at)}
+                    <MapPin className="size-3.5" /> {[l.district, l.region].filter(Boolean).join(', ')} · {t('limetangazwa', 'listed')} {shortDate(l.created_at)}
                   </CardDescription>
                   <CardAction>
                     <ListingStatusBadge status={l.status} />
@@ -262,11 +264,11 @@ export function MyCrops() {
                 <CardContent className="space-y-3 text-sm">
                   <div className="grid grid-cols-2 gap-2">
                     <div>
-                      <p className="text-xs text-muted-foreground">Your price</p>
+                      <p className="text-xs text-muted-foreground">{t('Bei yako', 'Your price')}</p>
                       <p className="font-semibold">{unitPrice(l.price_per_kg, user?.settings)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-muted-foreground">Gov. indicative</p>
+                      <p className="text-xs text-muted-foreground">{t('Bei elekezi', 'Gov. indicative')}</p>
                       <p className="font-semibold">
                         {l.gov_price ? unitPrice(l.gov_price.price, user?.settings) : '—'}
                         {l.vs_gov_pct != null && (
@@ -281,9 +283,9 @@ export function MyCrops() {
                   <div>
                     <div className="mb-1 flex justify-between text-xs text-muted-foreground">
                       <span>
-                        {num(l.quantity_kg - l.quantity_available_kg)} of {num(l.quantity_kg)} kg bought
+                        {t(`kg ${num(l.quantity_kg - l.quantity_available_kg)} kati ya ${num(l.quantity_kg)} yamenunuliwa`, `${num(l.quantity_kg - l.quantity_available_kg)} of ${num(l.quantity_kg)} kg bought`)}
                       </span>
-                      <span>{num(l.quantity_available_kg)} kg left</span>
+                      <span>{t(`kg ${num(l.quantity_available_kg)} zimebaki`, `${num(l.quantity_available_kg)} kg left`)}</span>
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-muted">
                       <div className="h-full rounded-full bg-primary" style={{ width: `${soldPct}%` }} />
@@ -293,37 +295,37 @@ export function MyCrops() {
                     {l.quality_grade && <Badge variant="outline">{l.quality_grade}</Badge>}
                     {!!l.in_carts && (
                       <Badge variant="info">
-                        <ShoppingCart /> In {l.in_carts} cart{l.in_carts > 1 ? 's' : ''}
+                        <ShoppingCart /> {t(`Kwenye kikapu ${l.in_carts}`, `In ${l.in_carts} cart${l.in_carts > 1 ? 's' : ''}`)}
                       </Badge>
                     )}
                     {!!activeOrders.length && (
                       <Badge variant="warning">
-                        {activeOrders.length} order{activeOrders.length > 1 ? 's' : ''}
+                        {t(`maagizo ${activeOrders.length}`, `${activeOrders.length} order${activeOrders.length > 1 ? 's' : ''}`)}
                       </Badge>
                     )}
                   </div>
                   <div className="flex flex-wrap gap-2 pt-1">
                     {!!l.orders?.length && (
                       <Button size="sm" variant="secondary" onClick={() => setOrderFor(l)}>
-                        <Truck /> Orders
+                        <Truck /> {t('Maagizo', 'Orders')}
                       </Button>
                     )}
                     {l.status !== 'sold' && l.status !== 'withdrawn' && (
                       <>
                         <Button size="sm" variant="outline" onClick={() => setEditing(l)}>
-                          <Pencil /> Edit
+                          <Pencil /> {t('Hariri', 'Edit')}
                         </Button>
                         <Button size="sm" variant="outline" onClick={() => setStatus(l, 'sold')}>
-                          <CheckCircle2 /> Mark sold
+                          <CheckCircle2 /> {t('Weka imeuzwa', 'Mark sold')}
                         </Button>
                       </>
                     )}
                     {(l.status === 'sold' || l.status === 'withdrawn') && l.quantity_available_kg > 0 && (
                       <Button size="sm" variant="outline" onClick={() => setStatus(l, 'available')}>
-                        Relist
+                        {t('Tangaza tena', 'Relist')}
                       </Button>
                     )}
-                    <Button size="sm" variant="ghost" onClick={() => remove(l)} aria-label="Remove">
+                    <Button size="sm" variant="ghost" onClick={() => remove(l)} aria-label={t('Ondoa', 'Remove')}>
                       <Trash2 className="text-muted-foreground" />
                     </Button>
                   </div>
@@ -347,7 +349,15 @@ export function MyCrops() {
 }
 
 function ListingDialog({ listing, onClose, onSaved }: { listing: Listing | 'new' | null; onClose: () => void; onSaved: () => void }) {
+  const t = useT()
   const { user, meta } = useAuth()
+  const grades = [
+    { value: 'Grade A', label: t('Daraja A', 'Grade A') },
+    { value: 'Grade 1', label: t('Daraja 1', 'Grade 1') },
+    { value: 'Grade 2', label: t('Daraja 2', 'Grade 2') },
+    { value: 'Grade 3', label: t('Daraja 3', 'Grade 3') },
+    { value: 'Ungraded', label: t('Haijapangwa daraja', 'Ungraded') },
+  ]
   const [form, setForm] = useState<Record<string, string>>({})
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState(false)
@@ -396,7 +406,7 @@ function ListingDialog({ listing, onClose, onSaved }: { listing: Listing | 'new'
     try {
       if (isNew) await api('/listings', { method: 'POST', body })
       else await api(`/listings/${(listing as Listing).id}`, { method: 'PUT', body })
-      toast.success(isNew ? 'Crop registered — buyers can now see it' : 'Listing updated')
+      toast.success(isNew ? t('Zao limesajiliwa — sasa wanunuzi wanaweza kuliona', 'Crop registered — buyers can now see it') : t('Tangazo limesasishwa', 'Listing updated'))
       onSaved()
     } catch (e) {
       if (e instanceof ApiError && e.fields) setErrors(e.fields)
@@ -410,63 +420,63 @@ function ListingDialog({ listing, onClose, onSaved }: { listing: Listing | 'new'
     <Dialog open={!!listing} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{isNew ? 'Register available crop' : 'Edit crop'}</DialogTitle>
-          <DialogDescription>Buyers see these details in the marketplace.</DialogDescription>
+          <DialogTitle>{isNew ? t('Sajili zao linalopatikana', 'Register available crop') : t('Hariri zao', 'Edit crop')}</DialogTitle>
+          <DialogDescription>{t('Wanunuzi huona maelezo haya sokoni.', 'Buyers see these details in the marketplace.')}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Crop" error={errors.crop}>
-            <SimpleSelect value={form.crop} onChange={(v) => setForm((f) => ({ ...f, crop: v }))} options={meta.crops} invalid={!!errors.crop} />
+          <Field label={t('Zao', 'Crop')} error={errors.crop}>
+            <SimpleSelect value={form.crop} onChange={(v) => setForm((f) => ({ ...f, crop: v }))} options={meta.crops.map((c) => ({ value: c, label: sw(c) }))} invalid={!!errors.crop} />
           </Field>
-          <Field label="Variety">
-            <Input value={form.variety ?? ''} onChange={set('variety')} placeholder="e.g. Kyela, Asante" />
+          <Field label={t('Aina', 'Variety')}>
+            <Input value={form.variety ?? ''} onChange={set('variety')} placeholder={t('mf. Kyela, Asante', 'e.g. Kyela, Asante')} />
           </Field>
-          <Field label="Quantity available (kg)" error={errors.quantity_kg}>
+          <Field label={t('Kiasi kinachopatikana (kg)', 'Quantity available (kg)')} error={errors.quantity_kg}>
             <Input type="number" min={0} value={form.quantity_kg ?? ''} onChange={set('quantity_kg')} aria-invalid={!!errors.quantity_kg} />
           </Field>
-          <Field label="Your price (TZS per kg)" error={errors.price_per_kg}>
+          <Field label={t('Bei yako (TZS kwa kg)', 'Your price (TZS per kg)')} error={errors.price_per_kg}>
             <Input type="number" min={0} value={form.price_per_kg ?? ''} onChange={set('price_per_kg')} aria-invalid={!!errors.price_per_kg} />
           </Field>
           {(gov || fc) && (
             <div className="grid gap-2 rounded-lg border bg-muted/40 p-3 text-sm sm:col-span-2 sm:grid-cols-3">
               <div>
-                <p className="text-xs text-muted-foreground">Gov. indicative</p>
+                <p className="text-xs text-muted-foreground">{t('Bei elekezi', 'Gov. indicative')}</p>
                 <p className="font-medium">{gov ? tzs(gov.price) : '—'}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Market today (AI)</p>
+                <p className="text-xs text-muted-foreground">{t('Soko leo (AI)', 'Market today (AI)')}</p>
                 <p className="font-medium">{fc ? tzs(fc.current_price) : '—'}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Best in 4 weeks</p>
+                <p className="text-xs text-muted-foreground">{t('Bora baada ya wiki 4', 'Best in 4 weeks')}</p>
                 <p className="font-medium">{fc ? `${tzs(fc.best_day_to_sell.price)} (${shortDate(fc.best_day_to_sell.date)})` : '—'}</p>
               </div>
             </div>
           )}
-          <Field label="Region" error={errors.region}>
+          <Field label={t('Mkoa', 'Region')} error={errors.region}>
             <SimpleSelect value={form.region} onChange={(v) => setForm((f) => ({ ...f, region: v }))} options={meta.regions} invalid={!!errors.region} />
           </Field>
-          <Field label="District">
+          <Field label={t('Wilaya', 'District')}>
             <Input value={form.district ?? ''} onChange={set('district')} />
           </Field>
-          <Field label="Harvest date">
+          <Field label={t('Tarehe ya mavuno', 'Harvest date')}>
             <Input type="date" value={form.harvest_date ?? ''} onChange={set('harvest_date')} />
           </Field>
-          <Field label="Quality">
-            <SimpleSelect value={form.quality_grade} onChange={(v) => setForm((f) => ({ ...f, quality_grade: v }))} options={GRADES} />
+          <Field label={t('Ubora', 'Quality')}>
+            <SimpleSelect value={form.quality_grade} onChange={(v) => setForm((f) => ({ ...f, quality_grade: v }))} options={grades} />
           </Field>
-          <Field label="Minimum order (kg)" error={errors.min_order_kg}>
-            <Input type="number" min={0} value={form.min_order_kg ?? ''} onChange={set('min_order_kg')} placeholder="Optional" />
+          <Field label={t('Agizo la chini (kg)', 'Minimum order (kg)')} error={errors.min_order_kg}>
+            <Input type="number" min={0} value={form.min_order_kg ?? ''} onChange={set('min_order_kg')} placeholder={t('Si lazima', 'Optional')} />
           </Field>
-          <Field label="Description" className="sm:col-span-2">
-            <Textarea value={form.description ?? ''} onChange={set('description')} placeholder="Moisture, packaging, transport…" />
+          <Field label={t('Maelezo', 'Description')} className="sm:col-span-2">
+            <Textarea value={form.description ?? ''} onChange={set('description')} placeholder={t('Unyevu, ufungashaji, usafirishaji…', 'Moisture, packaging, transport…')} />
           </Field>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            {t('Ghairi', 'Cancel')}
           </Button>
           <Button onClick={save} disabled={busy}>
-            {busy && <Loader2 className="animate-spin" />} {isNew ? 'Register crop' : 'Save changes'}
+            {busy && <Loader2 className="animate-spin" />} {isNew ? t('Sajili zao', 'Register crop') : t('Hifadhi mabadiliko', 'Save changes')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -475,13 +485,22 @@ function ListingDialog({ listing, onClose, onSaved }: { listing: Listing | 'new'
 }
 
 function OrdersDialog({ listing, onClose, onChanged }: { listing: Listing | null; onClose: () => void; onChanged: () => void }) {
+  const t = useT()
   const [orders, setOrders] = useState<Order[]>([])
   useEffect(() => setOrders(listing?.orders ?? []), [listing])
   const act = async (o: Order, status: string) => {
     try {
       const r = await api<{ order: Order }>(`/orders/${o.id}/status`, { method: 'PUT', body: { status } })
       setOrders((prev) => prev.map((x) => (x.id === o.id ? r.order : x)))
-      toast.success(`Order ${status}`)
+      toast.success(
+        status === 'confirmed'
+          ? t('Agizo limethibitishwa', 'Order confirmed')
+          : status === 'delivered'
+            ? t('Agizo limefikishwa', 'Order delivered')
+            : status === 'cancelled'
+              ? t('Agizo limeghairiwa', 'Order cancelled')
+              : t(`Agizo ${status}`, `Order ${status}`),
+      )
       onChanged()
     } catch (e) {
       toast.error((e as Error).message)
@@ -491,8 +510,8 @@ function OrdersDialog({ listing, onClose, onChanged }: { listing: Listing | null
     <Dialog open={!!listing} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Orders for {listing?.crop}</DialogTitle>
-          <DialogDescription>Confirm orders, then mark them delivered once the buyer has the crop.</DialogDescription>
+          <DialogTitle>{t(`Maagizo ya ${listing?.crop}`, `Orders for ${listing?.crop}`)}</DialogTitle>
+          <DialogDescription>{t('Thibitisha maagizo, kisha weka kuwa yamefikishwa pindi mnunuzi anapopata zao.', 'Confirm orders, then mark them delivered once the buyer has the crop.')}</DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
           {orders.map((o) => (
@@ -512,17 +531,17 @@ function OrdersDialog({ listing, onClose, onChanged }: { listing: Listing | null
               <div className="mt-2 flex gap-2">
                 {o.status === 'pending' && (
                   <Button size="sm" onClick={() => act(o, 'confirmed')}>
-                    <CheckCircle2 /> Confirm
+                    <CheckCircle2 /> {t('Thibitisha', 'Confirm')}
                   </Button>
                 )}
                 {o.status === 'confirmed' && (
                   <Button size="sm" onClick={() => act(o, 'delivered')}>
-                    <Truck /> Mark delivered
+                    <Truck /> {t('Weka imefikishwa', 'Mark delivered')}
                   </Button>
                 )}
                 {(o.status === 'pending' || o.status === 'confirmed') && (
                   <Button size="sm" variant="outline" onClick={() => act(o, 'cancelled')}>
-                    <XCircle /> Cancel
+                    <XCircle /> {t('Ghairi', 'Cancel')}
                   </Button>
                 )}
               </div>
@@ -536,6 +555,7 @@ function OrdersDialog({ listing, onClose, onChanged }: { listing: Listing | null
 
 /* ======================= Buyers ======================= */
 export function BuyersPage() {
+  const t = useT()
   const { meta } = useAuth()
   const [region, setRegion] = useState('all')
   const [crop, setCrop] = useState('all')
@@ -546,12 +566,12 @@ export function BuyersPage() {
   return (
     <>
       <PageHeader
-        title="Buyers"
-        description="Registered buyers on the platform — contact them directly or wait for their orders."
+        title={t('Wanunuzi', 'Buyers')}
+        description={t('Wanunuzi waliosajiliwa kwenye jukwaa — wasiliana nao moja kwa moja au subiri maagizo yao.', 'Registered buyers on the platform — contact them directly or wait for their orders.')}
         action={
           <div className="flex gap-2">
-            <SimpleSelect value={crop} onChange={setCrop} options={[{ value: 'all', label: 'All crops' }, ...meta.crops]} className="w-40" />
-            <SimpleSelect value={region} onChange={setRegion} options={[{ value: 'all', label: 'All regions' }, ...meta.regions]} className="w-40" />
+            <SimpleSelect value={crop} onChange={setCrop} options={[{ value: 'all', label: t('Mazao yote', 'All crops') }, ...meta.crops.map((c) => ({ value: c, label: sw(c) }))]} className="w-40" />
+            <SimpleSelect value={region} onChange={setRegion} options={[{ value: 'all', label: t('Mikoa yote', 'All regions') }, ...meta.regions]} className="w-40" />
           </div>
         }
       />
@@ -559,7 +579,7 @@ export function BuyersPage() {
       {loading ? (
         <LoadingRows />
       ) : !rows.length ? (
-        <EmptyState icon={Users} title="No buyers found" text="Try another region or crop." />
+        <EmptyState icon={Users} title={t('Hakuna wanunuzi waliopatikana', 'No buyers found')} text={t('Jaribu mkoa au zao lingine.', 'Try another region or crop.')} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {rows.map((b) => (
@@ -568,12 +588,12 @@ export function BuyersPage() {
                 <CardTitle>{b.business_name || b.full_name}</CardTitle>
                 <CardDescription>
                   {b.business_name && <>{b.full_name} · </>}
-                  {b.business_type ?? 'Buyer'}
+                  {b.business_type ?? t('Mnunuzi', 'Buyer')}
                 </CardDescription>
                 {(b.orders_with_you > 0 || b.in_cart_with_you > 0) && (
                   <CardAction>
                     <Badge variant={b.orders_with_you ? 'success' : 'info'}>
-                      {b.orders_with_you ? `${b.orders_with_you} order(s) with you` : 'Has your crop in cart'}
+                      {b.orders_with_you ? t(`maagizo ${b.orders_with_you} nawe`, `${b.orders_with_you} order(s) with you`) : t('Ana zao lako kwenye kikapu', 'Has your crop in cart')}
                     </Badge>
                   </CardAction>
                 )}
@@ -615,12 +635,21 @@ export function BuyersPage() {
 
 /* ======================= Orders ======================= */
 export function FarmerOrders() {
+  const t = useT()
   const { data, loading, error, reload } = useApi<{ orders: Order[] }>('/orders/farmer')
 
   const act = async (o: Order, status: string) => {
     try {
       await api(`/orders/${o.id}/status`, { method: 'PUT', body: { status } })
-      toast.success(status === 'confirmed' ? 'Order approved' : `Order ${status}`)
+      toast.success(
+        status === 'confirmed'
+          ? t('Agizo limeidhinishwa', 'Order approved')
+          : status === 'delivered'
+            ? t('Agizo limefikishwa', 'Order delivered')
+            : status === 'cancelled'
+              ? t('Agizo limeghairiwa', 'Order cancelled')
+              : t(`Agizo ${status}`, `Order ${status}`),
+      )
       reload()
     } catch (e) {
       toast.error((e as Error).message)
@@ -629,25 +658,25 @@ export function FarmerOrders() {
 
   return (
     <>
-      <PageHeader title="Orders" description="Approve orders buyers placed, then mark them delivered once the crop is handed over." />
+      <PageHeader title={t('Maagizo', 'Orders')} description={t('Idhinisha maagizo waliyoweka wanunuzi, kisha weka kuwa yamefikishwa pindi zao linapokabidhiwa.', 'Approve orders buyers placed, then mark them delivered once the crop is handed over.')} />
       {error && <ErrorBox message={error} />}
       {loading ? (
         <LoadingRows />
       ) : !data?.orders.length ? (
-        <EmptyState icon={ClipboardList} title="No orders yet" text="When a buyer orders one of your crops, it appears here to approve." />
+        <EmptyState icon={ClipboardList} title={t('Bado hakuna maagizo', 'No orders yet')} text={t('Mnunuzi anapoagiza mojawapo ya mazao yako, litaonekana hapa ili uidhinishe.', 'When a buyer orders one of your crops, it appears here to approve.')} />
       ) : (
         <Card className="py-2">
           <CardContent className="px-2 sm:px-4">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Crop</TableHead>
-                  <TableHead>Buyer</TableHead>
-                  <TableHead className="text-right">Quantity</TableHead>
-                  <TableHead className="text-right">Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+                  <TableHead>{t('Tarehe', 'Date')}</TableHead>
+                  <TableHead>{t('Zao', 'Crop')}</TableHead>
+                  <TableHead>{t('Mnunuzi', 'Buyer')}</TableHead>
+                  <TableHead className="text-right">{t('Kiasi', 'Quantity')}</TableHead>
+                  <TableHead className="text-right">{t('Jumla', 'Total')}</TableHead>
+                  <TableHead>{t('Hali', 'Status')}</TableHead>
+                  <TableHead className="text-right">{t('Kitendo', 'Action')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -671,16 +700,16 @@ export function FarmerOrders() {
                         {o.status === 'pending' && (
                           <>
                             <Button size="sm" onClick={() => act(o, 'confirmed')}>
-                              <CheckCircle2 /> Approve
+                              <CheckCircle2 /> {t('Idhinisha', 'Approve')}
                             </Button>
                             <Button size="sm" variant="outline" onClick={() => act(o, 'cancelled')}>
-                              <XCircle /> Decline
+                              <XCircle /> {t('Kataa', 'Decline')}
                             </Button>
                           </>
                         )}
                         {o.status === 'confirmed' && (
                           <Button size="sm" variant="outline" onClick={() => act(o, 'delivered')}>
-                            <Truck /> Mark delivered
+                            <Truck /> {t('Weka imefikishwa', 'Mark delivered')}
                           </Button>
                         )}
                         {(o.status === 'delivered' || o.status === 'cancelled') && (

@@ -14,13 +14,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Sheet, SheetContent } from '@/components/ui/sheet'
+import LanguageToggle from '@/components/shared/LanguageToggle'
 import { useAuth } from '@/context/AuthContext'
+import { useT } from '@/lib/i18n'
 import { initials } from '@/lib/format'
 import { cn } from '@/lib/utils'
 
+const ROLE_LABEL: Record<string, [string, string]> = {
+  farmer: ['Dashibodi ya mkulima', 'Farmer dashboard'],
+  buyer: ['Dashibodi ya mnunuzi', 'Buyer dashboard'],
+  admin: ['Dashibodi ya msimamizi', 'Admin dashboard'],
+}
+
 export interface NavItem {
   to: string
-  label: string
+  label: string // Kiswahili (default)
+  labelEn?: string // English (optional; shown when language = EN)
   icon: LucideIcon
   badge?: number
   end?: boolean
@@ -28,6 +37,8 @@ export interface NavItem {
 
 function SidebarNav({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => void }) {
   const { user } = useAuth()
+  const t = useT()
+  const roleLabel = ROLE_LABEL[user?.role ?? '']
   return (
     <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex items-center gap-2 px-5 py-5">
@@ -38,7 +49,7 @@ function SidebarNav({ items, onNavigate }: { items: NavItem[]; onNavigate?: () =
           <p className="font-display font-medium leading-tight">
             Agri-Market <span className="text-[#8DC63F]">AI</span>
           </p>
-          <p className="text-xs capitalize opacity-70">{user?.role} dashboard</p>
+          <p className="text-xs opacity-70">{roleLabel ? t(roleLabel[0], roleLabel[1]) : ''}</p>
         </div>
       </div>
       <nav className="flex-1 space-y-1 px-3">
@@ -56,12 +67,12 @@ function SidebarNav({ items, onNavigate }: { items: NavItem[]; onNavigate?: () =
             }
           >
             <it.icon className="size-4 opacity-80" />
-            <span className="flex-1">{it.label}</span>
+            <span className="flex-1">{it.labelEn ? t(it.label, it.labelEn) : it.label}</span>
             {!!it.badge && <Badge className="h-5 min-w-5 rounded-full px-1.5">{it.badge}</Badge>}
           </NavLink>
         ))}
       </nav>
-      <p className="px-5 py-4 text-xs opacity-60">Prices in Tanzanian Shillings (TZS)</p>
+      <p className="px-5 py-4 text-xs opacity-60">{t('Bei zote ziko kwa Shilingi za Tanzania (TZS)', 'Prices in Tanzanian Shillings (TZS)')}</p>
     </div>
   )
 }
@@ -69,6 +80,7 @@ function SidebarNav({ items, onNavigate }: { items: NavItem[]; onNavigate?: () =
 export function DashboardLayout({ items, basePath }: { items: NavItem[]; basePath: string }) {
   const { user, logout } = useAuth()
   const navigate = useNavigate()
+  const t = useT()
   const [open, setOpen] = useState(false)
 
   return (
@@ -83,12 +95,13 @@ export function DashboardLayout({ items, basePath }: { items: NavItem[]; basePat
       </Sheet>
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b bg-background/90 px-4 backdrop-blur md:px-6">
-          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(true)} aria-label="Open menu">
+          <Button variant="ghost" size="icon" className="lg:hidden" onClick={() => setOpen(true)} aria-label={t('Fungua menyu', 'Open menu')}>
             <Menu />
           </Button>
           <div className="flex-1 text-sm text-muted-foreground">
-            Karibu, <span className="font-medium text-foreground">{user?.full_name?.split(' ')[0]}</span>
+            {t('Karibu', 'Welcome')}, <span className="font-medium text-foreground">{user?.full_name?.split(' ')[0]}</span>
           </div>
+          <LanguageToggle className="mr-1" />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button className="flex items-center gap-2 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -104,10 +117,10 @@ export function DashboardLayout({ items, basePath }: { items: NavItem[]; basePat
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => navigate(`${basePath}/profile`)}>
-                <UserIcon /> Profile
+                <UserIcon /> {t('Wasifu', 'Profile')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => navigate(`${basePath}/settings`)}>
-                <SettingsIcon /> Settings
+                <SettingsIcon /> {t('Mipangilio', 'Settings')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -116,7 +129,7 @@ export function DashboardLayout({ items, basePath }: { items: NavItem[]; basePat
                   navigate('/login')
                 }}
               >
-                <LogOut /> Log out
+                <LogOut /> {t('Toka', 'Log out')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -61,14 +61,14 @@ def create_app(start_scheduler: bool = True) -> Flask:
 
     @app.errorhandler(404)
     def not_found(_):
-        return jsonify(error="Not found"), 404
+        return jsonify(error="Haikupatikana."), 404
 
     # Serve the built React app (frontend/dist) so one server hosts everything.
     @app.get("/", defaults={"path": ""})
     @app.get("/<path:path>")
     def spa(path: str):
         if path.startswith("api/"):
-            return jsonify(error="Not found"), 404
+            return jsonify(error="Haikupatikana."), 404
         if not FRONTEND_DIST.exists():
             return jsonify(message="API running. Build the frontend (cd frontend && npm run build) "
                                    "or run it with npm run dev."), 200

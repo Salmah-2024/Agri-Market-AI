@@ -3,34 +3,37 @@ import { Bell, Brain, Coins, Handshake, History, Landmark, MapPin, Moon, Scale, 
 import { CtaBand, PageHero, PrimaryLink, Reveal, SectionTitle, SmartImg, SplitSection } from '@/components/site/SiteLayout'
 import { BRAND } from '@/components/brand/Brand'
 import { LOCAL, PHOTOS } from '@/lib/siteImages'
-
-const JUMP = [
-  { icon: Brain, label: 'AI price prediction', href: '#prediction' },
-  { icon: Handshake, label: 'Direct marketplace', href: '#marketplace' },
-  { icon: Landmark, label: 'Government prices', href: '#gov-prices' },
-  { icon: History, label: 'Prediction history', href: '#history' },
-]
-
-const EXTRAS = [
-  { icon: MapPin, title: 'Default market region', text: 'Forecasts and prices open on your own region every time.' },
-  { icon: Scale, title: 'Per kg or per 100 kg bag', text: 'Show every price the way you trade — by kilo or by bag.' },
-  { icon: Bell, title: 'SMS & email alerts', text: 'Choose how you want to hear about orders and price changes.' },
-  { icon: Moon, title: 'Dark mode', text: 'Easy on the eyes when you check prices late at night.' },
-]
+import { useT } from '@/lib/i18n'
 
 export default function OfferPage() {
+  const t = useT()
+
+  const JUMP = [
+    { icon: Brain, label: t('Utabiri wa bei kwa AI', 'AI price prediction'), href: '#prediction' },
+    { icon: Handshake, label: t('Soko la moja kwa moja', 'Direct marketplace'), href: '#marketplace' },
+    { icon: Landmark, label: t('Bei za serikali', 'Government prices'), href: '#gov-prices' },
+    { icon: History, label: t('Historia ya utabiri', 'Prediction history'), href: '#history' },
+  ]
+
+  const EXTRAS = [
+    { icon: MapPin, title: t('Mkoa chaguo-msingi wa soko', 'Default market region'), text: t('Utabiri na bei hufunguka kwenye mkoa wako kila wakati.', 'Forecasts and prices open on your own region every time.') },
+    { icon: Scale, title: t('Kwa kilo au kwa gunia la kilo 100', 'Per kg or per 100 kg bag'), text: t('Onyesha kila bei jinsi unavyofanya biashara — kwa kilo au kwa gunia.', 'Show every price the way you trade — by kilo or by bag.') },
+    { icon: Bell, title: t('Taarifa za SMS na barua pepe', 'SMS & email alerts'), text: t('Chagua jinsi unavyotaka kupata taarifa kuhusu maagizo na mabadiliko ya bei.', 'Choose how you want to hear about orders and price changes.') },
+    { icon: Moon, title: t('Hali ya giza', 'Dark mode'), text: t('Rahisi kwa macho unapoangalia bei usiku wa manane.', 'Easy on the eyes when you check prices late at night.') },
+  ]
+
   return (
     <>
       <PageHero
         image={PHOTOS.manPhoneField}
-        crumbs="What we offer"
-        eyebrow="What we offer"
+        crumbs={t('Tunachotoa', 'What we offer')}
+        eyebrow={t('Tunachotoa', 'What we offer')}
         title={
           <>
-            One platform. <span className="text-[#B8E07A]">Four powerful tools.</span>
+            {t('Jukwaa moja.', 'One platform.')} <span className="text-[#B8E07A]">{t('Zana nne zenye nguvu.', 'Four powerful tools.')}</span>
           </>
         }
-        text="Agri-Market AI puts AI price forecasts, a direct marketplace and the government’s indicative prices side by side — so every decision is based on real numbers."
+        text={t('Agri-Market AI huweka utabiri wa bei kwa AI, soko la moja kwa moja na bei elekezi za serikali pamoja — ili kila uamuzi utegemee namba halisi.', 'Agri-Market AI puts AI price forecasts, a direct marketplace and the government’s indicative prices side by side — so every decision is based on real numbers.')}
       >
         <div className="mt-8 flex flex-wrap gap-3">
           {JUMP.map(({ icon: Icon, label, href }) => (
@@ -49,22 +52,22 @@ export default function OfferPage() {
       <SplitSection
         id="prediction"
         image={PHOTOS.phoneInField}
-        eyebrow="AI price prediction"
-        title="Know next week’s price — and the weeks ahead"
-        text="Every night the system runs the Random Forest model and produces a fresh multi-week forecast for each crop and region. You see when prices are likely to peak, before you decide."
+        eyebrow={t('Utabiri wa bei kwa AI', 'AI price prediction')}
+        title={t('Jua bei ya wiki ijayo — na wiki zinazofuata', 'Know next week’s price — and the weeks ahead')}
+        text={t('Kila usiku mfumo huendesha modeli ya Random Forest na kutoa utabiri mpya wa wiki kadhaa kwa kila zao na mkoa. Unaona bei zinapotarajiwa kufikia kilele, kabla hujaamua.', 'Every night the system runs the Random Forest model and produces a fresh multi-week forecast for each crop and region. You see when prices are likely to peak, before you decide.')}
         points={[
-          'Multi-week forecast for every crop and region, refreshed daily',
-          'Best week to sell (farmers) or best week to buy (buyers)',
-          'Value of your stock today vs. on the best week to sell',
-          'Run new predictions and save them to your history',
+          t('Utabiri wa wiki kadhaa kwa kila zao na mkoa, unaosasishwa kila siku', 'Multi-week forecast for every crop and region, refreshed daily'),
+          t('Wiki bora ya kuuza (wakulima) au wiki bora ya kununua (wanunuzi)', 'Best week to sell (farmers) or best week to buy (buyers)'),
+          t('Thamani ya hifadhi yako leo ikilinganishwa na wiki bora ya kuuza', 'Value of your stock today vs. on the best week to sell'),
+          t('Endesha utabiri mpya na uhifadhi kwenye historia yako', 'Run new predictions and save them to your history'),
         ]}
         badge={
           <div className="w-52">
-            <p className="text-xs text-gray-500">Best week to sell</p>
+            <p className="text-xs text-gray-500">{t('Wiki bora ya kuuza', 'Best week to sell')}</p>
             <p className="mt-0.5 flex items-center gap-1.5 text-lg font-extrabold">
-              <TrendingUp className="size-4" style={{ color: BRAND.green }} /> In 2 weeks
+              <TrendingUp className="size-4" style={{ color: BRAND.green }} /> {t('Baada ya wiki 2', 'In 2 weeks')}
             </p>
-            <p className="text-[10px] text-gray-400">Sample forecast</p>
+            <p className="text-[10px] text-gray-400">{t('Mfano wa utabiri', 'Sample forecast')}</p>
           </div>
         }
       />
@@ -75,14 +78,14 @@ export default function OfferPage() {
         tinted
         reverse
         image={PHOTOS.busyMarket}
-        eyebrow="Direct marketplace"
-        title="Farmers list. Buyers order. Nobody in between."
-        text="Farmers publish what they have in stock; buyers browse, add to cart and order directly. Both sides follow every order from placed to delivered."
+        eyebrow={t('Soko la moja kwa moja', 'Direct marketplace')}
+        title={t('Wakulima huorodhesha. Wanunuzi huagiza. Hakuna wa katikati.', 'Farmers list. Buyers order. Nobody in between.')}
+        text={t('Wakulima huchapisha walichonacho hifadhini; wanunuzi huvinjari, huongeza kwenye kikapu na kuagiza moja kwa moja. Pande zote mbili hufuatilia kila oda kutoka kuwekwa hadi kufikishwa.', 'Farmers publish what they have in stock; buyers browse, add to cart and order directly. Both sides follow every order from placed to delivered.')}
         points={[
-          'List crop, variety, kg, price, region, quality, harvest date and minimum order',
-          'Live listing status: Available, Partly bought, Bought or Withdrawn',
-          'Cart with cash, mobile money or bank payment and a delivery note',
-          'Farmers confirm, deliver or cancel orders from their dashboard',
+          t('Orodhesha zao, aina, kilo, bei, mkoa, ubora, tarehe ya mavuno na oda ya chini zaidi', 'List crop, variety, kg, price, region, quality, harvest date and minimum order'),
+          t('Hali ya tangazo wakati halisi: Inapatikana, Imenunuliwa kwa sehemu, Imenunuliwa au Imeondolewa', 'Live listing status: Available, Partly bought, Bought or Withdrawn'),
+          t('Kikapu chenye malipo ya pesa taslimu, pesa za simu au benki na ujumbe wa ufikishaji', 'Cart with cash, mobile money or bank payment and a delivery note'),
+          t('Wakulima huthibitisha, hufikisha au hughairi oda kutoka dashibodi yao', 'Farmers confirm, deliver or cancel orders from their dashboard'),
         ]}
       />
 
@@ -90,19 +93,19 @@ export default function OfferPage() {
       <SplitSection
         id="gov-prices"
         image={PHOTOS.sacks}
-        eyebrow="Government prices"
-        title="Every price checked against bei elekezi"
-        text="The official indicative price for each crop sits right next to the farmer’s price, today’s market estimate and next week’s AI price — so both sides can see what is fair."
+        eyebrow={t('Bei za serikali', 'Government prices')}
+        title={t('Kila bei inakaguliwa dhidi ya bei elekezi', 'Every price checked against bei elekezi')}
+        text={t('Bei elekezi rasmi ya kila zao hukaa karibu kabisa na bei ya mkulima, makadirio ya soko la leo na bei ya AI ya wiki ijayo — ili pande zote mbili zione kipi ni cha haki.', 'The official indicative price for each crop sits right next to the farmer’s price, today’s market estimate and next week’s AI price — so both sides can see what is fair.')}
         points={[
-          'Official indicative price per crop',
-          'Percentage difference shown on every listing',
-          'Today’s market estimate and next week’s AI price side by side',
+          t('Bei elekezi rasmi kwa kila zao', 'Official indicative price per crop'),
+          t('Tofauti ya asilimia inayoonyeshwa kwenye kila tangazo', 'Percentage difference shown on every listing'),
+          t('Makadirio ya soko la leo na bei ya AI ya wiki ijayo pamoja', 'Today’s market estimate and next week’s AI price side by side'),
         ]}
         badge={
           <div className="w-52">
-            <p className="text-xs text-gray-500">Farmer’s price vs. government</p>
-            <p className="mt-0.5 text-lg font-extrabold text-[#1E5631]">−4% below</p>
-            <p className="text-[10px] text-gray-400">Sample listing</p>
+            <p className="text-xs text-gray-500">{t('Bei ya mkulima dhidi ya serikali', 'Farmer’s price vs. government')}</p>
+            <p className="mt-0.5 text-lg font-extrabold text-[#1E5631]">{t('−4% chini', '−4% below')}</p>
+            <p className="text-[10px] text-gray-400">{t('Mfano wa tangazo', 'Sample listing')}</p>
           </div>
         }
       />
@@ -113,10 +116,10 @@ export default function OfferPage() {
         tinted
         reverse
         image={PHOTOS.chartLaptop}
-        eyebrow="Prediction history"
-        title="See how right the AI was"
-        text="Every prediction you run is saved. When the real prices arrive, Agri-Market AI shows how close each forecast came — so you learn how far to trust it."
-        points={['A full log of every prediction you ran', 'Accuracy for each one once real prices come in', 'Available to both farmers and buyers']}
+        eyebrow={t('Historia ya utabiri', 'Prediction history')}
+        title={t('Ona jinsi AI ilivyokuwa sahihi', 'See how right the AI was')}
+        text={t('Kila utabiri unaouendesha huhifadhiwa. Bei halisi zinapofika, Agri-Market AI huonyesha jinsi kila utabiri ulivyokaribia — ili ujifunze kiwango cha kuuamini.', 'Every prediction you run is saved. When the real prices arrive, Agri-Market AI shows how close each forecast came — so you learn how far to trust it.')}
+        points={[t('Kumbukumbu kamili ya kila utabiri uliouendesha', 'A full log of every prediction you ran'), t('Usahihi wa kila mmoja mara bei halisi zinapofika', 'Accuracy for each one once real prices come in'), t('Inapatikana kwa wakulima na wanunuzi', 'Available to both farmers and buyers')]}
       />
 
       {/* photo strip */}
@@ -133,7 +136,7 @@ export default function OfferPage() {
       {/* extras */}
       <section className="py-20 lg:py-28">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
-          <SectionTitle center eyebrow="And more" title="Settings that fit the way you trade" />
+          <SectionTitle center eyebrow={t('Na zaidi', 'And more')} title={t('Mipangilio inayolingana na jinsi unavyofanya biashara', 'Settings that fit the way you trade')} />
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {EXTRAS.map(({ icon: Icon, title, text }, i) => (
               <Reveal key={title} delay={i * 90}>
@@ -149,7 +152,7 @@ export default function OfferPage() {
           </div>
           <div className="mt-12 flex justify-center">
             <PrimaryLink to="/how-it-works">
-              <Coins className="size-4" /> See how it works
+              <Coins className="size-4" /> {t('Ona jinsi inavyofanya kazi', 'See how it works')}
             </PrimaryLink>
           </div>
         </div>

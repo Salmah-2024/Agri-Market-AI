@@ -24,10 +24,13 @@ import { toast } from 'sonner'
 
 import { BRAND, LeafMark, TractorArt } from '@/components/brand/Brand'
 import { SimpleSelect } from '@/components/shared/common'
+import LanguageToggle from '@/components/shared/LanguageToggle'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useAuth } from '@/context/AuthContext'
 import { ApiError } from '@/lib/api'
+import { useT } from '@/lib/i18n'
+import { sw } from '@/lib/crops'
 import type { Role } from '@/lib/types'
 import { cn } from '@/lib/utils'
 
@@ -55,8 +58,9 @@ function Img({ src, className, fallback = null }: { src: string; className?: str
 }
 
 function BrandMark({ light = false, className }: { light?: boolean; className?: string }) {
+  const t = useT()
   return (
-    <Link to="/" className={cn('inline-flex items-center gap-2.5', className)} aria-label="Agri-Market AI home">
+    <Link to="/" className={cn('inline-flex items-center gap-2.5', className)} aria-label={t('Agri-Market AI nyumbani', 'Agri-Market AI home')}>
       <span className={cn('grid size-10 place-items-center rounded-xl', light ? 'bg-white/95 shadow-lg' : 'bg-[#EEF5EA]')}>
         <Img src={IMAGES.logo} className="size-9 scale-[1.6]" fallback={<LeafMark className="size-6" />} />
       </span>
@@ -81,11 +85,12 @@ function PhotoPanel({ image, children, className }: { image: string; children: R
 }
 
 function Tagline({ className }: { className?: string }) {
+  const t = useT()
   return (
     <h2 className={cn('text-4xl leading-tight font-bold tracking-tight text-white xl:text-5xl', className)}>
-      <span style={{ color: BRAND.lime }}>Sell</span> at the right time,
+      <span style={{ color: BRAND.lime }}>{t('Uza', 'Sell')}</span> {t('kwa wakati sahihi,', 'at the right time,')}
       <br />
-      <span style={{ color: BRAND.lime }}>Buy</span> at the right price.
+      <span style={{ color: BRAND.lime }}>{t('Nunua', 'Buy')}</span> {t('kwa bei sahihi.', 'at the right price.')}
     </h2>
   )
 }
@@ -130,6 +135,7 @@ function IconInput({ icon: Icon, className, ...props }: ComponentProps<typeof In
 }
 
 function PasswordInput({ className, ...props }: ComponentProps<typeof Input>) {
+  const t = useT()
   const [show, setShow] = useState(false)
   return (
     <div className="relative">
@@ -138,7 +144,7 @@ function PasswordInput({ className, ...props }: ComponentProps<typeof Input>) {
       <button
         type="button"
         onClick={() => setShow((s) => !s)}
-        aria-label={show ? 'Hide password' : 'Show password'}
+        aria-label={show ? t('Ficha nenosiri', 'Hide password') : t('Onyesha nenosiri', 'Show password')}
         className="absolute top-1/2 right-2 grid size-8 -translate-y-1/2 place-items-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600"
       >
         {show ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -148,8 +154,9 @@ function PasswordInput({ className, ...props }: ComponentProps<typeof Input>) {
 }
 
 function PasswordStrength({ value }: { value: string }) {
+  const t = useT()
   const score = [value.length >= 8, /\d/.test(value), /[A-Z]/.test(value) || /[^A-Za-z0-9]/.test(value)].filter(Boolean).length
-  const labels = ['Too short', 'Weak', 'Good', 'Strong']
+  const labels = [t('Fupi mno', 'Too short'), t('Dhaifu', 'Weak'), t('Nzuri', 'Good'), t('Imara', 'Strong')]
   const colors = ['#E5E7EB', '#EF4444', '#F59E0B', BRAND.green]
   if (!value) return null
   return (
@@ -185,6 +192,7 @@ function PrimaryButton({ busy, children }: { busy: boolean; children: ReactNode 
 /*                               LOGIN                                */
 /* ================================================================== */
 export function LoginPage() {
+  const t = useT()
   const { login } = useAuth()
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
@@ -214,13 +222,16 @@ export function LoginPage() {
         <div className="max-w-lg">
           <Tagline />
           <p className="mt-4 text-base leading-relaxed text-white/80">
-            Weekly AI price forecasts and government indicative prices, so every harvest is sold at its true value.
+            {t(
+              'Utabiri wa bei wa AI wa kila wiki na bei elekezi za serikali, ili kila mavuno yauzwe kwa thamani yake halisi.',
+              'Weekly AI price forecasts and government indicative prices, so every harvest is sold at its true value.',
+            )}
           </p>
           <div className="mt-8 grid grid-cols-3 gap-3">
             {[
-              { v: '7', l: 'Crops forecast' },
-              { v: '26', l: 'Regions' },
-              { v: '4 weeks', l: 'AI outlook' },
+              { v: '7', l: t('Mazao yaliyotabiriwa', 'Crops forecast') },
+              { v: '26', l: t('Mikoa', 'Regions') },
+              { v: t('wiki 4', '4 weeks'), l: t('Mtazamo wa AI', 'AI outlook') },
             ].map((s) => (
               <div key={s.l} className="rounded-xl border border-white/15 bg-white/10 px-4 py-3 backdrop-blur-md">
                 <p className="text-xl font-bold text-white">{s.v}</p>
@@ -235,17 +246,20 @@ export function LoginPage() {
       <main className="flex flex-col px-6 py-8 sm:px-12">
         <div className="flex items-center justify-between">
           <BrandMark className="lg:invisible" />
-          <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#1E5631]">
-            <ArrowLeft className="size-4" /> Home
-          </Link>
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-[#1E5631]">
+              <ArrowLeft className="size-4" /> {t('Mwanzo', 'Home')}
+            </Link>
+          </div>
         </div>
 
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
           <span className="grid size-12 place-items-center rounded-2xl bg-[#EEF5EA]">
             <Sprout className="size-6" style={{ color: BRAND.green }} />
           </span>
-          <h1 className="mt-5 text-3xl font-bold tracking-tight text-[#111827]">Welcome back</h1>
-          <p className="mt-1.5 text-sm text-gray-500">Sign in to your Agri-Market AI account.</p>
+          <h1 className="mt-5 text-3xl font-bold tracking-tight text-[#111827]">{t('Karibu tena', 'Welcome back')}</h1>
+          <p className="mt-1.5 text-sm text-gray-500">{t('Ingia kwenye akaunti yako ya Agri-Market AI.', 'Sign in to your Agri-Market AI account.')}</p>
 
           <form onSubmit={submit} className="mt-8 grid gap-5">
             {error && (
@@ -253,7 +267,7 @@ export function LoginPage() {
                 {error}
               </p>
             )}
-            <Field label="Email address" htmlFor="login-email">
+            <Field label={t('Anwani ya barua pepe', 'Email address')} htmlFor="login-email">
               <IconInput
                 id="login-email"
                 icon={Mail}
@@ -265,12 +279,12 @@ export function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Field>
-            <Field label="Password" htmlFor="login-password">
+            <Field label={t('Nenosiri', 'Password')} htmlFor="login-password">
               <PasswordInput
                 id="login-password"
                 required
                 autoComplete="current-password"
-                placeholder="Enter your password"
+                placeholder={t('Weka nenosiri lako', 'Enter your password')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -278,24 +292,24 @@ export function LoginPage() {
 
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center gap-2 text-gray-600">
-                <input type="checkbox" className="size-4 rounded" style={{ accentColor: BRAND.green }} /> Remember me
+                <input type="checkbox" className="size-4 rounded" style={{ accentColor: BRAND.green }} /> {t('Nikumbuke', 'Remember me')}
               </label>
-              <span className="font-medium text-gray-400">Forgot password?</span>
+              <span className="font-medium text-gray-400">{t('Umesahau nenosiri?', 'Forgot password?')}</span>
             </div>
 
-            <PrimaryButton busy={busy}>Sign in</PrimaryButton>
+            <PrimaryButton busy={busy}>{t('Ingia', 'Sign in')}</PrimaryButton>
           </form>
 
           <p className="mt-8 text-center text-sm text-gray-500">
-            New to Agri-Market AI?{' '}
+            {t('Mgeni kwa Agri-Market AI?', 'New to Agri-Market AI?')}{' '}
             <Link to="/register" className="font-semibold hover:underline" style={{ color: BRAND.green }}>
-              Create an account
+              {t('Fungua akaunti', 'Create an account')}
             </Link>
           </p>
         </div>
 
         <p className="flex items-center justify-center gap-1.5 text-xs text-gray-400">
-          <ShieldCheck className="size-3.5" /> Passwords are stored hashed, never in plain text.
+          <ShieldCheck className="size-3.5" /> {t('Nenosiri huhifadhiwa kwa njia ya siri (hashed), kamwe si kama maandishi wazi.', 'Passwords are stored hashed, never in plain text.')}
         </p>
       </main>
     </div>
@@ -305,38 +319,48 @@ export function LoginPage() {
 /* ================================================================== */
 /*                              REGISTER                              */
 /* ================================================================== */
-const ROLE_COPY = {
-  farmer: {
-    image: IMAGES.farmerBg,
-    art: IMAGES.tractor,
-    title: 'Grow your income, not your middlemen.',
-    sub: 'List your harvest, see AI price forecasts for your region and sell straight to verified buyers.',
-    perks: [
-      { icon: TrendingUp, text: 'Weekly AI price forecasts for your crops' },
-      { icon: BadgeCheck, text: 'See buyers by region and crop' },
-      { icon: ShieldCheck, text: 'Compare with government prices' },
-    ],
-    heading: 'Create your farmer account',
-    swahili: 'Jisajili kama mkulima',
-    cropsLabel: 'Crops you grow',
-  },
-  buyer: {
-    image: IMAGES.buyerBg,
-    art: IMAGES.moneyPlant,
-    title: 'Source quality produce at the right price.',
-    sub: 'Browse crops listed by farmers across Tanzania, compare them with government prices and buy direct.',
-    perks: [
-      { icon: BadgeCheck, text: 'Every listing vs. the government price' },
-      { icon: TrendingUp, text: 'Weekly AI outlook on each crop' },
-      { icon: Truck, text: 'Cash, mobile money or bank payment' },
-    ],
-    heading: 'Create your buyer account',
-    swahili: 'Jisajili kama mnunuzi',
-    cropsLabel: 'Crops you buy',
-  },
-} as const
+type Translate = (sw: string, en: string) => string
+
+const roleCopy = (t: Translate) =>
+  ({
+    farmer: {
+      image: IMAGES.farmerBg,
+      art: IMAGES.tractor,
+      title: t('Ongeza kipato chako, si madalali wako.', 'Grow your income, not your middlemen.'),
+      sub: t(
+        'Orodhesha mavuno yako, ona utabiri wa bei wa AI kwa mkoa wako na uuze moja kwa moja kwa wanunuzi walioidhinishwa.',
+        'List your harvest, see AI price forecasts for your region and sell straight to verified buyers.',
+      ),
+      perks: [
+        { icon: TrendingUp, text: t('Utabiri wa bei wa AI wa kila wiki kwa mazao yako', 'Weekly AI price forecasts for your crops') },
+        { icon: BadgeCheck, text: t('Ona wanunuzi kwa mkoa na zao', 'See buyers by region and crop') },
+        { icon: ShieldCheck, text: t('Linganisha na bei za serikali', 'Compare with government prices') },
+      ],
+      heading: t('Fungua akaunti yako ya mkulima', 'Create your farmer account'),
+      swahili: t('Jisajili kama mkulima', 'Register as a farmer'),
+      cropsLabel: t('Mazao unayolima', 'Crops you grow'),
+    },
+    buyer: {
+      image: IMAGES.buyerBg,
+      art: IMAGES.moneyPlant,
+      title: t('Pata mazao bora kwa bei sahihi.', 'Source quality produce at the right price.'),
+      sub: t(
+        'Vinjari mazao yaliyoorodheshwa na wakulima kote Tanzania, yalinganishe na bei za serikali na ununue moja kwa moja.',
+        'Browse crops listed by farmers across Tanzania, compare them with government prices and buy direct.',
+      ),
+      perks: [
+        { icon: BadgeCheck, text: t('Kila orodha dhidi ya bei ya serikali', 'Every listing vs. the government price') },
+        { icon: TrendingUp, text: t('Mtazamo wa AI wa kila wiki kwa kila zao', 'Weekly AI outlook on each crop') },
+        { icon: Truck, text: t('Malipo ya pesa taslimu, pesa za simu au benki', 'Cash, mobile money or bank payment') },
+      ],
+      heading: t('Fungua akaunti yako ya mnunuzi', 'Create your buyer account'),
+      swahili: t('Jisajili kama mnunuzi', 'Register as a buyer'),
+      cropsLabel: t('Mazao unayonunua', 'Crops you buy'),
+    },
+  }) as const
 
 export function RegisterPage() {
+  const t = useT()
   const { register, meta } = useAuth()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
@@ -347,7 +371,7 @@ export function RegisterPage() {
   const [busy, setBusy] = useState(false)
   const set = (k: string) => (e: { target: { value: string } }) => setForm((f) => ({ ...f, [k]: e.target.value }))
   const isFarmer = role === 'farmer'
-  const copy = ROLE_COPY[role]
+  const copy = roleCopy(t)[role]
 
   const switchRole = (r: Role) => {
     setErrors({})
@@ -357,7 +381,7 @@ export function RegisterPage() {
   const submit = async (e: FormEvent) => {
     e.preventDefault()
     if (form.password !== form.confirm) {
-      setErrors({ confirm: 'Passwords do not match.' })
+      setErrors({ confirm: t('Manenosiri hayalingani.', 'Passwords do not match.') })
       return
     }
     setBusy(true)
@@ -368,7 +392,7 @@ export function RegisterPage() {
       if (isFarmer) body.main_crops = crops
       else body.interested_crops = crops
       const u = await register(body)
-      toast.success(`Karibu ${u.full_name.split(' ')[0]}! Your account is ready.`)
+      toast.success(t(`Karibu ${u.full_name.split(' ')[0]}! Akaunti yako iko tayari.`, `Karibu ${u.full_name.split(' ')[0]}! Your account is ready.`))
       navigate(`/${u.role}`)
     } catch (err) {
       if (err instanceof ApiError && err.fields) setErrors(err.fields)
@@ -393,7 +417,9 @@ export function RegisterPage() {
                 <Img src={copy.art} className="size-12" fallback={<TractorArt className="size-12" />} />
               )}
             </span>
-            <span className="text-sm font-semibold text-white capitalize">{role} account</span>
+            <span className="text-sm font-semibold text-white capitalize">
+              {isFarmer ? t('akaunti ya mkulima', 'farmer account') : t('akaunti ya mnunuzi', 'buyer account')}
+            </span>
           </div>
           <Tagline className="text-3xl xl:text-4xl" />
           <p className="mt-4 text-[15px] leading-relaxed text-white/80">{copy.sub}</p>
@@ -414,24 +440,27 @@ export function RegisterPage() {
       <main className="px-6 py-8 sm:px-10 xl:px-16">
         <div className="flex items-center justify-between">
           <BrandMark className="lg:invisible" />
-          <p className="text-sm text-gray-500">
-            Have an account?{' '}
-            <Link to="/login" className="font-semibold hover:underline" style={{ color: BRAND.green }}>
-              Sign in
-            </Link>
-          </p>
+          <div className="flex items-center gap-3">
+            <LanguageToggle />
+            <p className="text-sm text-gray-500">
+              {t('Una akaunti tayari?', 'Have an account?')}{' '}
+              <Link to="/login" className="font-semibold hover:underline" style={{ color: BRAND.green }}>
+                {t('Ingia', 'Sign in')}
+              </Link>
+            </p>
+          </div>
         </div>
 
         <div className="mx-auto w-full max-w-2xl py-10">
           <h1 className="text-3xl font-bold tracking-tight text-[#111827]">{copy.heading}</h1>
-          <p className="mt-1.5 text-sm text-gray-500">{copy.swahili} · takes less than 2 minutes</p>
+          <p className="mt-1.5 text-sm text-gray-500">{copy.swahili} · {t('inachukua chini ya dakika 2', 'takes less than 2 minutes')}</p>
 
           {/* role cards */}
-          <div role="tablist" aria-label="Account type" className="mt-7 grid grid-cols-2 gap-3">
+          <div role="tablist" aria-label={t('Aina ya akaunti', 'Account type')} className="mt-7 grid grid-cols-2 gap-3">
             {(
               [
-                { r: 'farmer', icon: Tractor, title: "I'm a farmer", desc: 'I grow and sell crops' },
-                { r: 'buyer', icon: ShoppingBasket, title: "I'm a buyer", desc: 'I purchase produce' },
+                { r: 'farmer', icon: Tractor, title: t('Mimi ni mkulima', "I'm a farmer"), desc: t('Nalima na kuuza mazao', 'I grow and sell crops') },
+                { r: 'buyer', icon: ShoppingBasket, title: t('Mimi ni mnunuzi', "I'm a buyer"), desc: t('Ninanunua mazao', 'I purchase produce') },
               ] as const
             ).map(({ r, icon: Icon, title, desc }) => {
               const on = role === r
@@ -470,33 +499,33 @@ export function RegisterPage() {
           <form onSubmit={submit} className="mt-8 grid gap-8">
             {/* --- personal --- */}
             <section className="grid gap-5 sm:grid-cols-2">
-              <h2 className="text-xs font-semibold tracking-wider text-gray-400 uppercase sm:col-span-2">Personal details</h2>
-              <Field label="Full name" htmlFor="full_name" error={errors.full_name} className="sm:col-span-2">
-                <IconInput id="full_name" icon={UserRound} placeholder="e.g. Asha Mwakyusa" value={form.full_name ?? ''} onChange={set('full_name')} required aria-invalid={!!errors.full_name} />
+              <h2 className="text-xs font-semibold tracking-wider text-gray-400 uppercase sm:col-span-2">{t('Taarifa binafsi', 'Personal details')}</h2>
+              <Field label={t('Jina kamili', 'Full name')} htmlFor="full_name" error={errors.full_name} className="sm:col-span-2">
+                <IconInput id="full_name" icon={UserRound} placeholder={t('mf. Asha Mwakyusa', 'e.g. Asha Mwakyusa')} value={form.full_name ?? ''} onChange={set('full_name')} required aria-invalid={!!errors.full_name} />
               </Field>
-              <Field label="Email" htmlFor="email" error={errors.email}>
+              <Field label={t('Barua pepe', 'Email')} htmlFor="email" error={errors.email}>
                 <IconInput id="email" icon={Mail} type="email" placeholder="you@example.com" value={form.email ?? ''} onChange={set('email')} required aria-invalid={!!errors.email} />
               </Field>
-              <Field label="Phone number" htmlFor="phone" error={errors.phone}>
+              <Field label={t('Namba ya simu', 'Phone number')} htmlFor="phone" error={errors.phone}>
                 <IconInput id="phone" icon={Phone} placeholder="0712 345 678" value={form.phone ?? ''} onChange={set('phone')} required aria-invalid={!!errors.phone} />
               </Field>
             </section>
 
             {/* --- location --- */}
             <section className="grid gap-5 sm:grid-cols-2">
-              <h2 className="text-xs font-semibold tracking-wider text-gray-400 uppercase sm:col-span-2">Location</h2>
-              <Field label="Region" htmlFor="region" error={errors.region}>
+              <h2 className="text-xs font-semibold tracking-wider text-gray-400 uppercase sm:col-span-2">{t('Mahali', 'Location')}</h2>
+              <Field label={t('Mkoa', 'Region')} htmlFor="region" error={errors.region}>
                 <SimpleSelect
                   value={form.region}
                   onChange={(v) => setForm((f) => ({ ...f, region: v }))}
                   options={meta.regions}
-                  placeholder="Select region"
+                  placeholder={t('Chagua mkoa', 'Select region')}
                   invalid={!!errors.region}
                   className={cn(inputCls, 'w-full')}
                 />
               </Field>
-              <Field label="District" htmlFor="district" error={errors.district}>
-                <IconInput id="district" icon={MapPin} placeholder="e.g. Dodoma Urban" value={form.district ?? ''} onChange={set('district')} required />
+              <Field label={t('Wilaya', 'District')} htmlFor="district" error={errors.district}>
+                <IconInput id="district" icon={MapPin} placeholder={t('mf. Dodoma Mjini', 'e.g. Dodoma Urban')} value={form.district ?? ''} onChange={set('district')} required />
               </Field>
             </section>
 
@@ -504,7 +533,7 @@ export function RegisterPage() {
             <section className="grid gap-3">
               <div className="flex items-baseline justify-between">
                 <h2 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{copy.cropsLabel}</h2>
-                <span className="text-xs text-gray-400">{crops.length ? `${crops.length} selected` : 'Select all that apply'}</span>
+                <span className="text-xs text-gray-400">{crops.length ? t(`${crops.length} yamechaguliwa`, `${crops.length} selected`) : t('Chagua yote yanayohusika', 'Select all that apply')}</span>
               </div>
               <div className="flex flex-wrap gap-2.5">
                 {meta.crops.map((c) => {
@@ -523,7 +552,7 @@ export function RegisterPage() {
                       )}
                     >
                       {on && <Check className="size-3.5" strokeWidth={3} />}
-                      {c}
+                      {sw(c)}
                     </button>
                   )
                 })}
@@ -532,13 +561,13 @@ export function RegisterPage() {
 
             {/* --- security --- */}
             <section className="grid gap-5 sm:grid-cols-2">
-              <h2 className="text-xs font-semibold tracking-wider text-gray-400 uppercase sm:col-span-2">Security</h2>
-              <Field label="Password" htmlFor="password" error={errors.password}>
-                <PasswordInput id="password" placeholder="At least 6 characters" autoComplete="new-password" value={form.password ?? ''} onChange={set('password')} required aria-invalid={!!errors.password} />
+              <h2 className="text-xs font-semibold tracking-wider text-gray-400 uppercase sm:col-span-2">{t('Usalama', 'Security')}</h2>
+              <Field label={t('Nenosiri', 'Password')} htmlFor="password" error={errors.password}>
+                <PasswordInput id="password" placeholder={t('Angalau herufi 6', 'At least 6 characters')} autoComplete="new-password" value={form.password ?? ''} onChange={set('password')} required aria-invalid={!!errors.password} />
                 <PasswordStrength value={form.password ?? ''} />
               </Field>
-              <Field label="Confirm password" htmlFor="confirm" error={errors.confirm}>
-                <PasswordInput id="confirm" placeholder="Repeat password" autoComplete="new-password" value={form.confirm ?? ''} onChange={set('confirm')} required aria-invalid={!!errors.confirm} />
+              <Field label={t('Thibitisha nenosiri', 'Confirm password')} htmlFor="confirm" error={errors.confirm}>
+                <PasswordInput id="confirm" placeholder={t('Rudia nenosiri', 'Repeat password')} autoComplete="new-password" value={form.confirm ?? ''} onChange={set('confirm')} required aria-invalid={!!errors.confirm} />
               </Field>
             </section>
 
@@ -546,11 +575,11 @@ export function RegisterPage() {
               <label className="flex items-start gap-2.5 text-sm text-gray-600">
                 <input type="checkbox" required className="mt-0.5 size-4 rounded" style={{ accentColor: BRAND.green }} />
                 <span>
-                  I agree to the <span className="font-medium text-gray-900">Terms of Service</span> and{' '}
-                  <span className="font-medium text-gray-900">Privacy Policy</span>.
+                  {t('Nakubaliana na', 'I agree to the')} <span className="font-medium text-gray-900">{t('Masharti ya Huduma', 'Terms of Service')}</span> {t('na', 'and')}{' '}
+                  <span className="font-medium text-gray-900">{t('Sera ya Faragha', 'Privacy Policy')}</span>.
                 </span>
               </label>
-              <PrimaryButton busy={busy}>Create {role} account</PrimaryButton>
+              <PrimaryButton busy={busy}>{isFarmer ? t('Fungua akaunti ya mkulima', 'Create farmer account') : t('Fungua akaunti ya mnunuzi', 'Create buyer account')}</PrimaryButton>
             </div>
           </form>
         </div>

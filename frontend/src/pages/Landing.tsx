@@ -21,37 +21,11 @@ import { DARK, Eyebrow, Reveal, SectionTitle, SmartImg } from '@/components/site
 import { useAuth } from '@/context/AuthContext'
 import { sw } from '@/lib/crops'
 import { num, shortDate, tzs } from '@/lib/format'
+import { useT } from '@/lib/i18n'
 import { CROP_PHOTOS, LOCAL, PHOTOS } from '@/lib/siteImages'
 import type { Forecast, GovPrice } from '@/lib/types'
 import { useApi } from '@/lib/useApi'
 import { cn } from '@/lib/utils'
-
-const FEATURES = [
-  {
-    icon: BadgeCheck,
-    title: 'Bei zilizothibitishwa',
-    text: 'Kila bei rasmi inaonyeshwa pamoja na chanzo chake na tarehe — hakuna bei isiyo na chanzo.',
-    image: PHOTOS.sacks,
-  },
-  {
-    icon: Handshake,
-    title: 'Moja kwa moja, bila dalali',
-    text: 'Mkulima anatangaza, mnunuzi anaagiza. Mnawasiliana moja kwa moja.',
-    image: LOCAL.deal,
-  },
-  {
-    icon: CalendarRange,
-    title: 'Utabiri wa wiki',
-    text: 'AI inakadiria bei za wiki zijazo ili upange lini kuuza au kununua.',
-    image: PHOTOS.manPhoneField,
-  },
-]
-
-const STEPS = [
-  { icon: Sprout, who: 'Mkulima', title: 'Tangaza mazao', text: 'Weka zao, kiasi, bei na mahali yalipo.' },
-  { icon: Search, who: 'Mnunuzi', title: 'Tafuta na uagize', text: 'Tafuta kwa zao na mkoa, kisha tuma oda moja kwa moja.' },
-  { icon: ClipboardList, who: 'Wote wawili', title: 'Fuatilia hadi mwisho', text: 'Oda inathibitishwa, inafikishwa — wote mnaona hatua kwa hatua.' },
-]
 
 interface PriceRow {
   crop: string
@@ -85,11 +59,63 @@ function TrendPill({ pct }: { pct: number }) {
 }
 
 export default function Landing() {
+  const t = useT()
   const { user } = useAuth()
   const { data: prices } = useApi<{ crops: PriceRow[] }>(user ? null : '/public/prices')
   const { data: market } = useApi<{ listings: MiniListing[] }>(user ? null : '/public/listings')
 
   if (user) return <Navigate to={`/${user.role}`} replace />
+
+  const FEATURES = [
+    {
+      icon: BadgeCheck,
+      title: t('Bei zilizothibitishwa', 'Verified prices'),
+      text: t(
+        'Kila bei rasmi inaonyeshwa pamoja na chanzo chake na tarehe — hakuna bei isiyo na chanzo.',
+        'Every official price is shown with its source and date — no price without a source.',
+      ),
+      image: PHOTOS.sacks,
+    },
+    {
+      icon: Handshake,
+      title: t('Moja kwa moja, bila dalali', 'Direct, no middlemen'),
+      text: t(
+        'Mkulima anatangaza, mnunuzi anaagiza. Mnawasiliana moja kwa moja.',
+        'The farmer posts, the buyer orders. You deal directly with each other.',
+      ),
+      image: LOCAL.deal,
+    },
+    {
+      icon: CalendarRange,
+      title: t('Utabiri wa wiki', 'Weekly forecast'),
+      text: t(
+        'AI inakadiria bei za wiki zijazo ili upange lini kuuza au kununua.',
+        'AI estimates prices for the coming weeks so you can plan when to sell or buy.',
+      ),
+      image: PHOTOS.manPhoneField,
+    },
+  ]
+
+  const STEPS = [
+    {
+      icon: Sprout,
+      who: t('Mkulima', 'Farmer'),
+      title: t('Tangaza mazao', 'Post your crops'),
+      text: t('Weka zao, kiasi, bei na mahali yalipo.', 'Add the crop, quantity, price and location.'),
+    },
+    {
+      icon: Search,
+      who: t('Mnunuzi', 'Buyer'),
+      title: t('Tafuta na uagize', 'Search and order'),
+      text: t('Tafuta kwa zao na mkoa, kisha tuma oda moja kwa moja.', 'Search by crop and region, then place an order directly.'),
+    },
+    {
+      icon: ClipboardList,
+      who: t('Wote wawili', 'Both of you'),
+      title: t('Fuatilia hadi mwisho', 'Track to the end'),
+      text: t('Oda inathibitishwa, inafikishwa — wote mnaona hatua kwa hatua.', 'The order is confirmed and delivered — you both follow every step.'),
+    },
+  ]
 
   return (
     <>
@@ -101,18 +127,21 @@ export default function Landing() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pt-16 pb-24 md:px-8 lg:grid-cols-[1.15fr_1fr] lg:pt-24 lg:pb-32">
           <div>
             <Reveal>
-              <Eyebrow light>Mahindi · Mchele · Tanzania</Eyebrow>
+              <Eyebrow light>{t('Mazao 7 ya Wizara · Tanzania', '7 Ministry crops · Tanzania')}</Eyebrow>
             </Reveal>
             <Reveal delay={100}>
               <h1 className="mt-6 text-5xl leading-[1.03] font-extrabold tracking-tight sm:text-6xl xl:text-7xl">
-                Uza kwa wakati sahihi.
+                {t('Uza kwa wakati sahihi.', 'Sell at the right time.')}
                 <br />
-                <span className="text-[#B8E07A]">Nunua kwa bei yenye taarifa.</span>
+                <span className="text-[#B8E07A]">{t('Nunua ukijua bei halisi.', 'Buy at an informed price.')}</span>
               </h1>
             </Reveal>
             <Reveal delay={200}>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/80">
-                Agri-Market AI inawaunganisha wakulima na wanunuzi wa mazao yote 7, ikionyesha bei za soko na utabiri wa wiki.
+                {t(
+                  'Agri-Market AI inawaunganisha wakulima na wanunuzi wa mazao yote 7, ikionyesha bei za soko na utabiri wa wiki.',
+                  'Agri-Market AI connects farmers and buyers of all 7 crops, showing market prices and weekly forecasts.',
+                )}
               </p>
             </Reveal>
             <Reveal delay={300}>
@@ -121,22 +150,26 @@ export default function Landing() {
                   to="/soko"
                   className="group inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 text-sm font-semibold text-[#1E5631] shadow-xl transition hover:-translate-y-0.5"
                 >
-                  <ShoppingBasket className="size-4" /> Nenda sokoni
+                  <ShoppingBasket className="size-4" /> {t('Nenda sokoni', 'Go to the market')}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                 </Link>
                 <Link
                   to="/bei"
                   className="group inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/40 px-7 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
                 >
-                  <CalendarRange className="size-4" /> Angalia bei na utabiri
+                  <CalendarRange className="size-4" /> {t('Angalia bei na utabiri', 'View prices and forecasts')}
                 </Link>
               </div>
             </Reveal>
             <Reveal delay={400}>
               <ul className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/80">
-                {['Bei zenye chanzo na tarehe', 'Bila dalali', 'Kwa Kiswahili'].map((t) => (
-                  <li key={t} className="flex items-center gap-1.5">
-                    <Check className="size-4 text-[#8DC63F]" strokeWidth={3} /> {t}
+                {[
+                  t('Bei zenye chanzo na tarehe', 'Prices with source and date'),
+                  t('Bila dalali', 'No middlemen'),
+                  t('Kwa Kiswahili', 'In Swahili'),
+                ].map((label) => (
+                  <li key={label} className="flex items-center gap-1.5">
+                    <Check className="size-4 text-[#8DC63F]" strokeWidth={3} /> {label}
                   </li>
                 ))}
               </ul>
@@ -147,9 +180,9 @@ export default function Landing() {
           <Reveal delay={250}>
             <div className="rounded-[2rem] bg-white/10 p-5 ring-1 ring-white/20 backdrop-blur-md sm:p-6">
               <div className="flex items-center justify-between">
-                <p className="font-semibold">Bei za leo · wastani wa kitaifa</p>
+                <p className="font-semibold">{t('Bei za leo · wastani wa kitaifa', "Today's prices · national average")}</p>
                 <span className="flex items-center gap-1.5 text-xs text-white/70">
-                  <span className="size-2 animate-pulse rounded-full bg-[#8DC63F]" /> Inasasishwa kila siku
+                  <span className="size-2 animate-pulse rounded-full bg-[#8DC63F]" /> {t('Inasasishwa kila siku', 'Updated daily')}
                 </span>
               </div>
               <div className="mt-5 grid gap-4">
@@ -159,11 +192,13 @@ export default function Landing() {
                     <div className="min-w-0 flex-1">
                       <p className="font-bold">{sw(r.crop)}</p>
                       <p className="truncate text-xs text-gray-500">
-                        {r.official ? `Bei elekezi ${tzs(r.official.price)}/kg · ${shortDate(r.official.date)}` : 'Inapakia…'}
+                        {r.official
+                          ? `${t('Bei elekezi', 'Indicative price')} ${tzs(r.official.price)}/kg · ${shortDate(r.official.date)}`
+                          : t('Inapakia…', 'Loading…')}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-gray-500">AI wiki 4</p>
+                      <p className="text-xs text-gray-500">{t('AI wiki 4', 'AI week 4')}</p>
                       {r.forecast ? (
                         <>
                           <p className="font-bold text-[#1E5631]">{tzs(r.forecast.forecast[r.forecast.forecast.length - 1].price)}</p>
@@ -176,7 +211,12 @@ export default function Landing() {
                   </Link>
                 ))}
               </div>
-              <p className="mt-4 text-[11px] text-white/60">Utabiri ni makadirio. Bei rasmi zinaonyeshwa pamoja na chanzo na tarehe.</p>
+              <p className="mt-4 text-[11px] text-white/60">
+                {t(
+                  'Utabiri ni makadirio. Bei rasmi zinaonyeshwa pamoja na chanzo na tarehe.',
+                  'Forecasts are estimates. Official prices are shown with their source and date.',
+                )}
+              </p>
             </div>
           </Reveal>
         </div>
@@ -185,7 +225,11 @@ export default function Landing() {
       {/* ---------------- FEATURES ---------------- */}
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
-          <SectionTitle center eyebrow="Kwa nini Agri-Market AI" title="Maamuzi ya soko yanayoongozwa na taarifa" />
+          <SectionTitle
+            center
+            eyebrow={t('Kwa nini Agri-Market AI', 'Why Agri-Market AI')}
+            title={t('Maamuzi ya soko yanayoongozwa na takwimu', 'Market decisions driven by information')}
+          />
           <div className="mt-14 grid gap-6 md:grid-cols-3">
             {FEATURES.map(({ icon: Icon, title, text, image }, i) => (
               <Reveal key={title} delay={i * 110}>
@@ -212,8 +256,8 @@ export default function Landing() {
         <div className="pointer-events-none absolute inset-0 -z-10 opacity-30 [background:radial-gradient(circle_at_15%_20%,#8DC63F_0,transparent_40%),radial-gradient(circle_at_85%_80%,#E8CBA8_0,transparent_35%)]" />
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <Reveal className="mx-auto max-w-2xl text-center">
-            <Eyebrow light>Inavyofanya kazi</Eyebrow>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-5xl">Hatua tatu tu</h2>
+            <Eyebrow light>{t('Inavyofanya kazi', 'How it works')}</Eyebrow>
+            <h2 className="mt-4 text-3xl font-extrabold tracking-tight sm:text-5xl">{t('Hatua tatu tu', 'Just three steps')}</h2>
           </Reveal>
           <div className="relative mt-16 grid gap-6 md:grid-cols-3">
             <div className="absolute top-10 right-[16%] left-[16%] hidden h-0.5 bg-gradient-to-r from-[#8DC63F]/0 via-[#8DC63F] to-[#8DC63F]/0 md:block" />
@@ -238,10 +282,10 @@ export default function Landing() {
       <section className="py-24">
         <div className="mx-auto max-w-7xl px-5 md:px-8">
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-            <SectionTitle eyebrow="Sokoni sasa hivi" title="Mazao mapya kutoka kwa wakulima" />
+            <SectionTitle eyebrow={t('Sokoni sasa hivi', 'In the market right now')} title={t('Mazao mapya kutoka kwa wakulima', 'Fresh crops from farmers')} />
             <Reveal>
               <Link to="/soko" className="group inline-flex items-center gap-2 font-semibold text-[#1E5631]">
-                Ona soko lote <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
+                {t('Ona soko lote', 'See the whole market')} <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
               </Link>
             </Reveal>
           </div>
@@ -281,20 +325,28 @@ export default function Landing() {
             {
               img: PHOTOS.farmerField,
               art: LOCAL.tractor,
-              who: 'Kwa wakulima',
-              title: 'Jua bei kabla hujavuna',
-              points: ['Utabiri wa wiki wa mazao yako', 'Tangaza mazao na simamia oda', 'Wafikie wanunuzi kwa mkoa'],
+              who: t('Kwa wakulima', 'For farmers'),
+              title: t('Jua bei kabla hujavuna', 'Know the price before you harvest'),
+              points: [
+                t('Utabiri wa wiki wa mazao yako', 'A weekly forecast for your crops'),
+                t('Tangaza mazao na simamia oda', 'Post crops and manage orders'),
+                t('Wafikie wanunuzi kwa mkoa', 'Reach buyers by region'),
+              ],
               to: '/register?role=farmer',
-              cta: 'Jisajili kama mkulima',
+              cta: t('Jisajili kama mkulima', 'Sign up as a farmer'),
             },
             {
               img: PHOTOS.vendorPhone,
               art: LOCAL.money,
-              who: 'Kwa wanunuzi',
-              title: 'Nunua kwa bei ya haki',
-              points: ['Kila tangazo dhidi ya bei elekezi', 'Mtazamo wa AI kwa kila zao', 'Lipa kwa taslimu, simu au benki'],
+              who: t('Kwa wanunuzi', 'For buyers'),
+              title: t('Nunua kwa bei ya haki', 'Buy at a fair price'),
+              points: [
+                t('Kila tangazo dhidi ya bei elekezi', 'Every listing against the indicative price'),
+                t('Mtazamo wa AI kwa kila zao', 'An AI outlook for every crop'),
+                t('Lipa kwa taslimu, simu au benki', 'Pay by cash, mobile money or bank'),
+              ],
               to: '/register?role=buyer',
-              cta: 'Jisajili kama mnunuzi',
+              cta: t('Jisajili kama mnunuzi', 'Sign up as a buyer'),
             },
           ].map((c, i) => (
             <Reveal key={c.who} delay={i * 150}>
@@ -330,20 +382,20 @@ export default function Landing() {
           <div className="relative isolate mx-auto max-w-6xl overflow-hidden rounded-[2.5rem] px-8 py-16 text-center text-white shadow-2xl sm:px-16 sm:py-20">
             <SmartImg src={PHOTOS.womanHarvestingRice} alt="" className="absolute inset-0 -z-20 h-full w-full" />
             <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#0B2414]/95 via-[#1E5631]/85 to-[#8A5A2B]/80" />
-            <h2 className="mx-auto max-w-3xl text-3xl font-extrabold tracking-tight sm:text-5xl">Anza kuuza au kununua leo</h2>
-            <p className="mx-auto mt-5 max-w-xl text-lg text-white/80">Fungua akaunti kwa chini ya dakika mbili.</p>
+            <h2 className="mx-auto max-w-3xl text-3xl font-extrabold tracking-tight sm:text-5xl">{t('Anza kuuza au kununua leo', 'Start selling or buying today')}</h2>
+            <p className="mx-auto mt-5 max-w-xl text-lg text-white/80">{t('Fungua akaunti kwa chini ya dakika mbili.', 'Open an account in under two minutes.')}</p>
             <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
               <Link
                 to="/register?role=farmer"
                 className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 text-sm font-semibold text-[#1E5631] shadow-xl transition hover:-translate-y-0.5"
               >
-                <Tractor className="size-4" /> Mimi ni mkulima
+                <Tractor className="size-4" /> {t('Mimi ni mkulima', "I'm a farmer")}
               </Link>
               <Link
                 to="/register?role=buyer"
                 className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/40 px-7 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
               >
-                <ShoppingBasket className="size-4" /> Mimi ni mnunuzi
+                <ShoppingBasket className="size-4" /> {t('Mimi ni mnunuzi', "I'm a buyer")}
               </Link>
             </div>
           </div>

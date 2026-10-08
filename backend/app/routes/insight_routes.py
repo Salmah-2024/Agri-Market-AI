@@ -38,9 +38,9 @@ def run_prediction():
     data = request.get_json(silent=True) or {}
     crop = data.get("crop")
     if crop not in CROPS:
-        return jsonify(error="Select a crop."), 400
+        return jsonify(error="Chagua zao."), 400
     if not get_forecaster().available().get(crop):
-        return jsonify(error=f"No trained model for {crop} yet."), 400
+        return jsonify(error=f"Bado hakuna modeli iliyofunzwa kwa {crop}."), 400
     region = _region(data.get("region"))
     days = int(data.get("days") or 7)
     result = get_forecaster().forecast(crop, region, days=days, observations=observations(crop, region))
@@ -118,6 +118,6 @@ def gov_prices():
 def gov_price_history():
     crop = request.args.get("crop")
     if crop not in CROPS:
-        return jsonify(error="Select a crop."), 400
+        return jsonify(error="Chagua zao."), 400
     rows = get_db().gov_prices.find({"crop": crop}).sort("date", -1).limit(200)
     return jsonify(history=[clean(r) for r in rows])

@@ -12,39 +12,46 @@ import { Input } from '@/components/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { api } from '@/lib/api'
 import { num, shortDate } from '@/lib/format'
+import { useT } from '@/lib/i18n'
 import type { Order, Shipment, TransportAgency, TransportMode } from '@/lib/types'
 import { useApi } from '@/lib/useApi'
 import { cn } from '@/lib/utils'
 
 const MODE_ICON = { road: Truck, air: Plane, water: Ship } as const
 const MODES: TransportMode[] = ['road', 'air', 'water']
-const MODE_LABEL = { road: 'Road', air: 'Air', water: 'Water' }
+const modeLabels = (t: (sw: string, en: string) => string): Record<TransportMode, string> => ({
+  road: t('Barabara', 'Road'),
+  air: t('Anga', 'Air'),
+  water: t('Maji', 'Water'),
+})
 
 function StatusBadge({ status }: { status: Shipment['status'] }) {
+  const t = useT()
   const map = {
-    requested: { v: 'warning', t: 'Requested' },
-    dispatched: { v: 'info', t: 'Sent / In transit' },
-    delivered: { v: 'success', t: 'Delivered' },
-    cancelled: { v: 'muted', t: 'Cancelled' },
+    requested: { v: 'warning', t: t('Imeombwa', 'Requested') },
+    dispatched: { v: 'info', t: t('Imetumwa / Njiani', 'Sent / In transit') },
+    delivered: { v: 'success', t: t('Imefikishwa', 'Delivered') },
+    cancelled: { v: 'muted', t: t('Imeghairiwa', 'Cancelled') },
   } as const
   const s = map[status]
   return <Badge variant={s.v}>{s.t}</Badge>
 }
 
 function AgencyContact({ a }: { a: Shipment['agency'] }) {
+  const t = useT()
   return (
     <div className="flex flex-wrap items-center gap-2 text-sm">
       <span className="font-medium">{a.name}</span>
       {a.verified && (
         <span className="inline-flex items-center gap-1 text-xs text-emerald-600">
-          <BadgeCheck className="size-3.5" /> Trusted
+          <BadgeCheck className="size-3.5" /> {t('Imethibitishwa', 'Trusted')}
         </span>
       )}
       <a href={`tel:${a.phone}`} className="inline-flex items-center gap-1 text-primary hover:underline">
         <Phone className="size-3.5" /> {a.phone}
       </a>
       <a href={`mailto:${a.email}`} className="inline-flex items-center gap-1 text-primary hover:underline">
-        <Mail className="size-3.5" /> Email
+        <Mail className="size-3.5" /> {t('Barua pepe', 'Email')}
       </a>
     </div>
   )
@@ -52,6 +59,8 @@ function AgencyContact({ a }: { a: Shipment['agency'] }) {
 
 // ---------------- Buyer: request + track transport ----------------
 export function BuyerTransport() {
+  const t = useT()
+  const ML = modeLabels(t)
   const orders = useApi<{ orders: Order[] }>('/orders/buyer')
   const ships = useApi<{ shipments: Shipment[] }>('/transport/mine')
   const [requesting, setRequesting] = useState<Order | null>(null)
@@ -64,12 +73,12 @@ export function BuyerTransport() {
 
   return (
     <>
-      <PageHeader title="Transport" description="Choose a trusted agency to move your purchase — by road, air or water — and track it." />
+      <PageHeader title={t('Usafirishaji', 'Transport')} description={t('Chagua wakala unayemwamini kusafirisha ununuzi wako — kwa barabara, anga au maji — na ufuatilie.', 'Choose a trusted agency to move your purchase — by road, air or water — and track it.')} />
       {(orders.error || ships.error) && <ErrorBox message={orders.error || ships.error || ''} />}
       {orders.loading ? (
         <LoadingRows />
       ) : !orders.data?.orders.length ? (
-        <EmptyState icon={Truck} title="No orders to ship" text="Buy a crop first, then request transport here." />
+        <EmptyState icon={Truck} title={t('Hakuna oda za kusafirisha', 'No orders to ship')} text={t('Nunua zao kwanza, kisha omba usafirishaji hapa.', 'Buy a crop first, then request transport here.')} />
       ) : (
         <div className="grid gap-4">
           {orders.data.orders.map((o) => {
@@ -81,7 +90,7 @@ export function BuyerTransport() {
                   <div className="min-w-0">
                     <p className="font-medium">
                       {o.crop} · {num(o.quantity_kg)} kg
-                      <span className="ml-2 text-xs text-muted-foreground">from {o.farmer_name}</span>
+                      <span className="ml-2 text-xs text-muted-foreground">{t('kutoka', 'from')} {o.farmer_name}</span>
                     </p>
                     <p className="mt-0.5 flex items-center gap-1 text-sm text-muted-foreground">
                       <MapPin className="size-3.5" /> {o.region}
@@ -91,19 +100,19 @@ export function BuyerTransport() {
                     <div className="flex flex-col items-start gap-1.5 sm:items-end">
                       <div className="flex items-center gap-2">
                         <Icon className="size-4 text-primary" />
-                        <span className="text-sm">{MODE_LABEL[s.mode]}</span>
+                        <span className="text-sm">{ML[s.mode]}</span>
                         <StatusBadge status={s.status} />
                       </div>
                       <AgencyContact a={s.agency} />
                     </div>
                   ) : o.status === 'confirmed' || o.status === 'delivered' ? (
                     <Button onClick={() => setRequesting(o)}>
-                      <Truck className="size-4" /> Request transport
+                      <Truck className="size-4" /> {t('Omba usafirishaji', 'Request transport')}
                     </Button>
                   ) : o.status === 'cancelled' ? (
-                    <Badge variant="muted">Order cancelled</Badge>
+                    <Badge variant="muted">{t('Oda imeghairiwa', 'Order cancelled')}</Badge>
                   ) : (
-                    <Badge variant="warning">Waiting for farmer approval</Badge>
+                    <Badge variant="warning">{t('Inasubiri idhini ya mkulima', 'Waiting for farmer approval')}</Badge>
                   )}
                 </CardContent>
               </Card>
@@ -124,6 +133,8 @@ export function BuyerTransport() {
 }
 
 function RequestDialog({ order, onClose, onDone }: { order: Order | null; onClose: () => void; onDone: () => void }) {
+  const t = useT()
+  const ML = modeLabels(t)
   const [mode, setMode] = useState<TransportMode | ''>('')
   const [agencyId, setAgencyId] = useState('')
   const [note, setNote] = useState('')
@@ -139,12 +150,12 @@ function RequestDialog({ order, onClose, onDone }: { order: Order | null; onClos
     setNote('')
   }
   const submit = async () => {
-    if (!order || !mode) return toast.error('Choose a transport mode.')
-    if (!agencyId) return toast.error('Choose an agency.')
+    if (!order || !mode) return toast.error(t('Chagua njia ya usafirishaji.', 'Choose a transport mode.'))
+    if (!agencyId) return toast.error(t('Chagua wakala.', 'Choose an agency.'))
     setBusy(true)
     try {
       await api('/transport/request', { method: 'POST', body: { order_id: order.id, mode, agency_id: agencyId, note } })
-      toast.success('Transport requested')
+      toast.success(t('Usafirishaji umeombwa', 'Transport requested'))
       reset()
       onDone()
     } catch (e) {
@@ -158,15 +169,15 @@ function RequestDialog({ order, onClose, onDone }: { order: Order | null; onClos
     <Dialog open={!!order} onOpenChange={(o) => !o && (reset(), onClose())}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Request transport</DialogTitle>
+          <DialogTitle>{t('Omba usafirishaji', 'Request transport')}</DialogTitle>
           <DialogDescription>
-            {order?.crop} · {order ? num(order.quantity_kg) : 0} kg · from {region}
+            {order?.crop} · {order ? num(order.quantity_kg) : 0} kg · {t('kutoka', 'from')} {region}
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
           <div>
-            <p className="mb-2 text-sm font-medium">1. Route / mode</p>
+            <p className="mb-2 text-sm font-medium">{t('1. Njia / usafiri', '1. Route / mode')}</p>
             <div className="grid grid-cols-3 gap-2">
               {MODES.map((m) => {
                 const Icon = MODE_ICON[m]
@@ -183,7 +194,7 @@ function RequestDialog({ order, onClose, onDone }: { order: Order | null; onClos
                       mode === m ? 'border-primary bg-primary/5 font-medium' : 'hover:bg-muted',
                     )}
                   >
-                    <Icon className="size-5 text-primary" /> {MODE_LABEL[m]}
+                    <Icon className="size-5 text-primary" /> {ML[m]}
                   </button>
                 )
               })}
@@ -192,12 +203,12 @@ function RequestDialog({ order, onClose, onDone }: { order: Order | null; onClos
 
           {mode && (
             <div>
-              <p className="mb-2 text-sm font-medium">2. Agency serving {region}</p>
+              <p className="mb-2 text-sm font-medium">{t('2. Wakala anayehudumia', '2. Agency serving')} {region}</p>
               {agencies.loading ? (
                 <LoadingRows rows={2} />
               ) : !agencies.data?.agencies.length ? (
                 <p className="rounded-md bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
-                  No {MODE_LABEL[mode].toLowerCase()} agency serves {region} yet. Try another mode.
+                  {t(`Hakuna wakala wa ${ML[mode].toLowerCase()} anayehudumia ${region} bado. Jaribu njia nyingine.`, `No ${ML[mode].toLowerCase()} agency serves ${region} yet. Try another mode.`)}
                 </p>
               ) : (
                 <div className="grid max-h-56 gap-2 overflow-y-auto">
@@ -232,18 +243,18 @@ function RequestDialog({ order, onClose, onDone }: { order: Order | null; onClos
 
           {agencyId && (
             <div>
-              <p className="mb-2 text-sm font-medium">3. Note for the agency (optional)</p>
-              <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. Collect from the warehouse" />
+              <p className="mb-2 text-sm font-medium">{t('3. Ujumbe kwa wakala (hiari)', '3. Note for the agency (optional)')}</p>
+              <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('mf. Chukua kutoka ghalani', 'e.g. Collect from the warehouse')} />
             </div>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => (reset(), onClose())}>
-            Cancel
+            {t('Ghairi', 'Cancel')}
           </Button>
           <Button onClick={submit} disabled={busy || !agencyId}>
-            {busy ? 'Requesting…' : 'Request transport'}
+            {busy ? t('Inaomba…', 'Requesting…') : t('Omba usafirishaji', 'Request transport')}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -253,12 +264,13 @@ function RequestDialog({ order, onClose, onDone }: { order: Order | null; onClos
 
 // ---------------- Farmer: dispatch shipments ----------------
 export function FarmerShipments() {
+  const t = useT()
   const { data, loading, error, reload } = useApi<{ shipments: Shipment[] }>('/transport/farmer')
 
   const advance = async (s: Shipment, status: Shipment['status']) => {
     try {
       await api(`/transport/${s.id}/status`, { method: 'PATCH', body: { status } })
-      toast.success(status === 'dispatched' ? 'Marked as sent' : 'Marked as delivered')
+      toast.success(status === 'dispatched' ? t('Imewekwa imetumwa', 'Marked as sent') : t('Imewekwa imefikishwa', 'Marked as delivered'))
       reload()
     } catch (e) {
       toast.error((e as Error).message)
@@ -267,24 +279,24 @@ export function FarmerShipments() {
 
   return (
     <>
-      <PageHeader title="Shipments" description="Transport buyers requested for your sold crops. Mark them as sent when the agency collects." />
+      <PageHeader title={t('Mizigo', 'Shipments')} description={t('Usafirishaji wanunuzi walioomba kwa mazao yako yaliyouzwa. Weka imetumwa wakala anapochukua.', 'Transport buyers requested for your sold crops. Mark them as sent when the agency collects.')} />
       {error && <ErrorBox message={error} />}
       {loading ? (
         <LoadingRows />
       ) : !data?.shipments.length ? (
-        <EmptyState icon={Truck} title="No shipments yet" text="When a buyer requests transport for an order, it appears here." />
+        <EmptyState icon={Truck} title={t('Bado hakuna mizigo', 'No shipments yet')} text={t('Mnunuzi anapoomba usafirishaji kwa oda, utaonekana hapa.', 'When a buyer requests transport for an order, it appears here.')} />
       ) : (
         <Card className="py-2">
           <CardContent className="px-2 sm:px-4">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Crop</TableHead>
-                  <TableHead>Buyer</TableHead>
-                  <TableHead>Route</TableHead>
-                  <TableHead>Agency</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Action</TableHead>
+                  <TableHead>{t('Zao', 'Crop')}</TableHead>
+                  <TableHead>{t('Mnunuzi', 'Buyer')}</TableHead>
+                  <TableHead>{t('Njia', 'Route')}</TableHead>
+                  <TableHead>{t('Wakala', 'Agency')}</TableHead>
+                  <TableHead>{t('Hali', 'Status')}</TableHead>
+                  <TableHead className="text-right">{t('Kitendo', 'Action')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -309,12 +321,12 @@ export function FarmerShipments() {
                       <TableCell className="text-right">
                         {s.status === 'requested' && (
                           <Button size="sm" onClick={() => advance(s, 'dispatched')}>
-                            Mark sent
+                            {t('Weka imetumwa', 'Mark sent')}
                           </Button>
                         )}
                         {s.status === 'dispatched' && (
                           <Button size="sm" variant="outline" onClick={() => advance(s, 'delivered')}>
-                            Mark delivered
+                            {t('Weka imefikishwa', 'Mark delivered')}
                           </Button>
                         )}
                         {(s.status === 'delivered' || s.status === 'cancelled') && (

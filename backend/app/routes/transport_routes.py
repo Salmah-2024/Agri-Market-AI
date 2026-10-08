@@ -46,21 +46,21 @@ def request_transport():
     db = get_db()
     order = db.orders.find_one({"_id": oid(data.get("order_id")), "buyer_id": g.user["_id"]})
     if not order:
-        return jsonify(error="Order not found."), 404
+        return jsonify(error="Agizo halikupatikana."), 404
     if order.get("status") not in ("confirmed", "delivered"):
-        return jsonify(error="The farmer must approve this order before you can request transport."), 409
+        return jsonify(error="Mkulima lazima aidhinishe agizo hili kabla hujaomba usafirishaji."), 409
     mode = data.get("mode")
     if mode not in MODES:
-        return jsonify(error="Choose road, air or water."), 400
+        return jsonify(error="Chagua barabara, anga au maji."), 400
     agency = db.transport_agencies.find_one({"_id": oid(data.get("agency_id"))})
     if not agency:
-        return jsonify(error="Select a transport agency."), 400
+        return jsonify(error="Chagua wakala wa usafirishaji."), 400
     pickup = order.get("region")
     if pickup not in agency.get("regions", []) or mode not in agency.get("modes", []):
-        return jsonify(error="This agency does not serve that region or mode."), 400
+        return jsonify(error="Wakala huyu hahudumii mkoa au njia hiyo."), 400
     existing = db.shipments.find_one({"order_id": order["_id"], "status": {"$ne": "cancelled"}})
     if existing:
-        return jsonify(error="A shipment already exists for this order."), 409
+        return jsonify(error="Tayari kuna mzigo kwa agizo hili."), 409
     shipment = {
         "buyer_id": g.user["_id"],
         "buyer_name": g.user.get("full_name"),
@@ -103,14 +103,14 @@ def set_status(sid):
     """Seller (farmer who owns the order) or an admin advances the shipment."""
     status = (request.get_json(silent=True) or {}).get("status")
     if status not in STATUSES:
-        return jsonify(error="Invalid status."), 400
+        return jsonify(error="Hali si sahihi."), 400
     db = get_db()
     shipment = db.shipments.find_one({"_id": oid(sid)})
     if not shipment:
-        return jsonify(error="Shipment not found."), 404
+        return jsonify(error="Mzigo haukupatikana."), 404
     is_owner = g.user["role"] == "admin" or shipment.get("farmer_id") == g.user["_id"]
     if not is_owner:
-        return jsonify(error="Only the seller or an admin can update a shipment."), 403
+        return jsonify(error="Ni muuzaji au msimamizi pekee wanaoweza kusasisha mzigo."), 403
     db.shipments.update_one({"_id": shipment["_id"]},
                             {"$set": {"status": status, "updated_at": datetime.utcnow()}})
     return jsonify(shipment=clean(db.shipments.find_one({"_id": shipment["_id"]})))

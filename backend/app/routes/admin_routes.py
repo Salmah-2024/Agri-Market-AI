@@ -38,7 +38,7 @@ def add_prices():
     JSON {"source": "...", "prices": [{crop, region, price, date}]} or CSV text
     with columns crop,region,price,date[,min_price,max_price]."""
     if not _admin_via_key_or_jwt():
-        return jsonify(error="Admin access required."), 403
+        return jsonify(error="Unahitaji ruhusa ya msimamizi."), 403
     if request.is_json:
         body = request.get_json()
         rows, source = body.get("prices", []), body.get("source", "Ministry market bulletin")

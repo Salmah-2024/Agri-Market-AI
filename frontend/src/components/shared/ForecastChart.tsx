@@ -1,6 +1,7 @@
 import { Area, CartesianGrid, ComposedChart, Line, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { shortDate, tzs } from '@/lib/format'
+import { useT } from '@/lib/i18n'
 import type { Forecast } from '@/lib/types'
 
 interface Row {
@@ -11,6 +12,7 @@ interface Row {
 }
 
 export function ForecastChart({ forecast, govPrice, height = 280 }: { forecast: Forecast; govPrice?: number | null; height?: number }) {
+  const t = useT()
   const rows: Row[] = forecast.recent.map((r) => ({ date: r.date, actual: r.price }))
   // connect the lines at "today"
   if (rows.length) rows[rows.length - 1].predicted = rows[rows.length - 1].actual
@@ -49,8 +51,8 @@ export function ForecastChart({ forecast, govPrice, height = 280 }: { forecast: 
             }}
             labelFormatter={(l) => shortDate(String(l))}
             formatter={(v, name) => {
-              if (Array.isArray(v)) return [`${tzs(v[0])} – ${tzs(v[1])}`, 'Likely range']
-              return [tzs(Number(v)) + '/kg', name === 'actual' ? 'Market price' : 'AI prediction']
+              if (Array.isArray(v)) return [`${tzs(v[0])} – ${tzs(v[1])}`, t('Kiwango kinachowezekana', 'Likely range')]
+              return [tzs(Number(v)) + '/kg', name === 'actual' ? t('Bei ya soko', 'Market price') : t('Utabiri wa AI', 'AI prediction')]
             }}
           />
           <Area dataKey="band" stroke="none" fill="var(--chart-2)" fillOpacity={0.18} isAnimationActive={false} />
@@ -68,7 +70,7 @@ export function ForecastChart({ forecast, govPrice, height = 280 }: { forecast: 
               y={govPrice}
               stroke="var(--chart-3)"
               strokeDasharray="2 3"
-              label={{ value: 'Gov. price', position: 'insideTopLeft', fill: 'var(--chart-3)', fontSize: 11 }}
+              label={{ value: t('Bei elekezi', 'Gov. price'), position: 'insideTopLeft', fill: 'var(--chart-3)', fontSize: 11 }}
             />
           ) : null}
           <ReferenceLine x={forecast.as_of} stroke="var(--muted-foreground)" strokeOpacity={0.4} />
@@ -79,20 +81,21 @@ export function ForecastChart({ forecast, govPrice, height = 280 }: { forecast: 
 }
 
 export function ChartLegend({ gov }: { gov?: boolean }) {
+  const t = useT()
   return (
     <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
       <span className="flex items-center gap-1.5">
-        <span className="h-0.5 w-4 bg-chart-1" /> Market price (last 30 days)
+        <span className="h-0.5 w-4 bg-chart-1" /> {t('Bei ya soko (siku 30 zilizopita)', 'Market price (last 30 days)')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="h-0.5 w-4 border-t-2 border-dashed border-chart-2" /> AI prediction
+        <span className="h-0.5 w-4 border-t-2 border-dashed border-chart-2" /> {t('Utabiri wa AI', 'AI prediction')}
       </span>
       <span className="flex items-center gap-1.5">
-        <span className="h-2.5 w-4 rounded-sm bg-chart-2/20" /> Likely range
+        <span className="h-2.5 w-4 rounded-sm bg-chart-2/20" /> {t('Kiwango kinachowezekana', 'Likely range')}
       </span>
       {gov && (
         <span className="flex items-center gap-1.5">
-          <span className="h-0.5 w-4 border-t-2 border-dotted border-chart-3" /> Government indicative price
+          <span className="h-0.5 w-4 border-t-2 border-dotted border-chart-3" /> {t('Bei elekezi ya serikali', 'Government indicative price')}
         </span>
       )}
     </div>

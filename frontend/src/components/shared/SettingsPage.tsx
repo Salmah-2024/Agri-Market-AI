@@ -14,10 +14,12 @@ import { Separator } from '@/components/ui/separator'
 import { Switch } from '@/components/ui/switch'
 import { useAuth } from '@/context/AuthContext'
 import { api } from '@/lib/api'
+import { useT } from '@/lib/i18n'
 import type { Settings, User } from '@/lib/types'
 import { useTheme } from '@/lib/theme'
 
 export default function SettingsPage() {
+  const t = useT()
   const { user, setUser, meta, logout } = useAuth()
   const navigate = useNavigate()
   const { dark, setDark } = useTheme()
@@ -30,7 +32,7 @@ export default function SettingsPage() {
     try {
       const r = await api<{ user: User }>('/settings', { method: 'PUT', body: patch })
       setUser(r.user)
-      toast.success('Settings saved')
+      toast.success(t('Mipangilio imehifadhiwa', 'Settings saved'))
     } catch (e) {
       toast.error((e as Error).message)
     }
@@ -41,7 +43,7 @@ export default function SettingsPage() {
     try {
       await api('/settings/password', { method: 'PUT', body: pw })
       setPw({ current_password: '', new_password: '' })
-      toast.success('Password changed')
+      toast.success(t('Nenosiri limebadilishwa', 'Password changed'))
     } catch (e) {
       toast.error((e as Error).message)
     } finally {
@@ -53,30 +55,30 @@ export default function SettingsPage() {
     await api('/settings/account', { method: 'DELETE' })
     logout()
     navigate('/')
-    toast.success('Account deleted')
+    toast.success(t('Akaunti imefutwa', 'Account deleted'))
   }
 
   const s = user.settings
   return (
     <>
-      <PageHeader title="Settings" description="Market, display, notification and account settings." />
+      <PageHeader title={t('Mipangilio', 'Settings')} description={t('Mipangilio ya soko, maonyesho, taarifa na akaunti.', 'Market, display, notification and account settings.')} />
       <div className="grid max-w-3xl gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Market & prices</CardTitle>
-            <CardDescription>Used by default for predictions and government prices.</CardDescription>
+            <CardTitle>{t('Soko na bei', 'Market & prices')}</CardTitle>
+            <CardDescription>{t('Hutumika kama chaguo-msingi kwa utabiri na bei za serikali.', 'Used by default for predictions and government prices.')}</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
-            <Field label="Default market region">
+            <Field label={t('Mkoa chaguo-msingi wa soko', 'Default market region')}>
               <SimpleSelect value={s.market_region} onChange={(v) => update({ market_region: v })} options={meta.market_regions} />
             </Field>
-            <Field label="Show prices per">
+            <Field label={t('Onyesha bei kwa', 'Show prices per')}>
               <SimpleSelect
                 value={s.price_unit}
                 onChange={(v) => update({ price_unit: v as Settings['price_unit'] })}
                 options={[
-                  { value: 'kg', label: 'Kilogram (kg)' },
-                  { value: 'bag', label: 'Bag (100 kg)' },
+                  { value: 'kg', label: t('Kilogramu (kg)', 'Kilogram (kg)') },
+                  { value: 'bag', label: t('Gunia (kg 100)', 'Bag (100 kg)') },
                 ]}
               />
             </Field>
@@ -85,18 +87,18 @@ export default function SettingsPage() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Notifications & display</CardTitle>
+            <CardTitle>{t('Arifa na maonyesho', 'Notifications & display')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Row label="SMS alerts" hint="New orders and big price changes">
+            <Row label={t('Arifa za SMS', 'SMS alerts')} hint={t('Oda mpya na mabadiliko makubwa ya bei', 'New orders and big price changes')}>
               <Switch checked={s.notify_sms} onCheckedChange={(v) => update({ notify_sms: v })} />
             </Row>
             <Separator />
-            <Row label="Email alerts" hint="Weekly price summary">
+            <Row label={t('Arifa za barua pepe', 'Email alerts')} hint={t('Muhtasari wa bei wa kila wiki', 'Weekly price summary')}>
               <Switch checked={s.notify_email} onCheckedChange={(v) => update({ notify_email: v })} />
             </Row>
             <Separator />
-            <Row label="Dark mode" hint="Saved on this device" icon={<Moon className="size-4" />}>
+            <Row label={t('Hali ya giza', 'Dark mode')} hint={t('Imehifadhiwa kwenye kifaa hiki', 'Saved on this device')} icon={<Moon className="size-4" />}>
               <Switch checked={dark} onCheckedChange={setDark} />
             </Row>
           </CardContent>
@@ -105,23 +107,23 @@ export default function SettingsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <KeyRound className="size-5" /> Change password
+              <KeyRound className="size-5" /> {t('Badili nenosiri', 'Change password')}
             </CardTitle>
           </CardHeader>
           <CardContent className="grid gap-4 sm:grid-cols-2">
-            <Field label="Current password">
+            <Field label={t('Nenosiri la sasa', 'Current password')}>
               <Input
                 type="password"
                 value={pw.current_password}
                 onChange={(e) => setPw({ ...pw, current_password: e.target.value })}
               />
             </Field>
-            <Field label="New password" hint="At least 6 characters">
+            <Field label={t('Nenosiri jipya', 'New password')} hint={t('Angalau herufi 6', 'At least 6 characters')}>
               <Input type="password" value={pw.new_password} onChange={(e) => setPw({ ...pw, new_password: e.target.value })} />
             </Field>
             <div>
               <Button onClick={changePassword} disabled={pwBusy || !pw.current_password || !pw.new_password}>
-                {pwBusy && <Loader2 className="animate-spin" />} Update password
+                {pwBusy && <Loader2 className="animate-spin" />} {t('Sasisha nenosiri', 'Update password')}
               </Button>
             </div>
           </CardContent>
@@ -129,14 +131,14 @@ export default function SettingsPage() {
 
         <Card className="border-destructive/40">
           <CardHeader>
-            <CardTitle className="text-destructive">Delete account</CardTitle>
+            <CardTitle className="text-destructive">{t('Futa akaunti', 'Delete account')}</CardTitle>
             <CardDescription>
-              Removes your account. {user.role === 'farmer' ? 'Your unsold crops are withdrawn from the market.' : 'Your cart is emptied.'}
+              {t('Inaondoa akaunti yako.', 'Removes your account.')} {user.role === 'farmer' ? t('Mazao yako ambayo hayajauzwa yanaondolewa sokoni.', 'Your unsold crops are withdrawn from the market.') : t('Kikapu chako kinamwagwa.', 'Your cart is emptied.')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button variant="destructive" onClick={() => setConfirmDelete(true)}>
-              <Trash2 /> Delete my account
+              <Trash2 /> {t('Futa akaunti yangu', 'Delete my account')}
             </Button>
           </CardContent>
         </Card>
@@ -145,15 +147,15 @@ export default function SettingsPage() {
       <Dialog open={confirmDelete} onOpenChange={setConfirmDelete}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete your account?</DialogTitle>
-            <DialogDescription>This cannot be undone.</DialogDescription>
+            <DialogTitle>{t('Kufuta akaunti yako?', 'Delete your account?')}</DialogTitle>
+            <DialogDescription>{t('Hili haliwezi kutenduliwa.', 'This cannot be undone.')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={() => setConfirmDelete(false)}>
-              Cancel
+              {t('Ghairi', 'Cancel')}
             </Button>
             <Button variant="destructive" onClick={deleteAccount}>
-              Delete
+              {t('Futa', 'Delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -37,22 +37,22 @@ def register():
     data = request.get_json(silent=True) or {}
     role = data.get("role")
     if role not in ("farmer", "buyer"):
-        return jsonify(error="Choose whether you are a farmer or a buyer."), 400
+        return jsonify(error="Chagua kama wewe ni mkulima au mnunuzi."), 400
     errors = {}
     email = str(data.get("email", "")).strip().lower()
     if not data.get("full_name", "").strip():
-        errors["full_name"] = "Full name is required."
+        errors["full_name"] = "Jina kamili linahitajika."
     if not EMAIL_RE.match(email):
-        errors["email"] = "Enter a valid email."
+        errors["email"] = "Weka barua pepe sahihi."
     phone = re.sub(r"\s+", "", str(data.get("phone", "")))
     if not re.match(r"^(\+?255|0)[67]\d{8}$", phone):
-        errors["phone"] = "Enter a valid Tanzanian phone number, e.g. 0712345678."
+        errors["phone"] = "Weka namba sahihi ya simu ya Tanzania, mf. 0712345678."
     if len(str(data.get("password", ""))) < 6:
-        errors["password"] = "Password must be at least 6 characters."
+        errors["password"] = "Nenosiri lazima liwe na herufi 6 au zaidi."
     if data.get("region") not in ALL_REGIONS[1:] and data.get("region") != "Other":
-        errors["region"] = "Select your region."
+        errors["region"] = "Chagua mkoa wako."
     if errors:
-        return jsonify(error="Please fix the highlighted fields.", fields=errors), 400
+        return jsonify(error="Tafadhali rekebisha sehemu zilizoangaziwa.", fields=errors), 400
     user = {"role": role, "email": email, "password_hash": generate_password_hash(data["password"])}
     for f in PROFILE_FIELDS[role]:
         if f in data:
@@ -63,7 +63,7 @@ def register():
     try:
         user["_id"] = get_db().users.insert_one(user).inserted_id
     except DuplicateKeyError:
-        return jsonify(error="An account with this email already exists.", fields={"email": "Already registered."}), 409
+        return jsonify(error="Tayari kuna akaunti yenye barua pepe hii.", fields={"email": "Tayari imesajiliwa."}), 409
     return jsonify(token=make_token(user), user=public_user(user)), 201
 
 
@@ -72,7 +72,7 @@ def login():
     data = request.get_json(silent=True) or {}
     user = get_db().users.find_one({"email": str(data.get("email", "")).strip().lower()})
     if not user or not check_password_hash(user["password_hash"], str(data.get("password", ""))):
-        return jsonify(error="Wrong email or password."), 401
+        return jsonify(error="Barua pepe au nenosiri si sahihi."), 401
     return jsonify(token=make_token(user), user=public_user(user))
 
 
@@ -88,7 +88,7 @@ def update_profile():
     data = request.get_json(silent=True) or {}
     updates = {f: data[f] for f in PROFILE_FIELDS[g.user["role"]] if f in data}
     if not updates:
-        return jsonify(error="Nothing to update."), 400
+        return jsonify(error="Hakuna cha kusasisha."), 400
     get_db().users.update_one({"_id": g.user["_id"]}, {"$set": updates})
     return jsonify(user=public_user(get_db().users.find_one({"_id": g.user["_id"]})))
 
@@ -102,9 +102,9 @@ def update_settings():
         if k in data:
             settings[k] = data[k]
     if settings["market_region"] not in ALL_REGIONS:
-        return jsonify(error="Unknown region."), 400
+        return jsonify(error="Mkoa haujulikani."), 400
     if settings["price_unit"] not in ("kg", "bag"):
-        return jsonify(error="Unit must be kg or bag."), 400
+        return jsonify(error="Kipimo lazima kiwe kg au bag."), 400
     get_db().users.update_one({"_id": g.user["_id"]}, {"$set": {"settings": settings}})
     return jsonify(user=public_user(get_db().users.find_one({"_id": g.user["_id"]})))
 
@@ -114,9 +114,9 @@ def update_settings():
 def change_password():
     data = request.get_json(silent=True) or {}
     if not check_password_hash(g.user["password_hash"], str(data.get("current_password", ""))):
-        return jsonify(error="Current password is wrong."), 400
+        return jsonify(error="Nenosiri la sasa si sahihi."), 400
     if len(str(data.get("new_password", ""))) < 6:
-        return jsonify(error="New password must be at least 6 characters."), 400
+        return jsonify(error="Nenosiri jipya lazima liwe na herufi 6 au zaidi."), 400
     get_db().users.update_one(
         {"_id": g.user["_id"]}, {"$set": {"password_hash": generate_password_hash(data["new_password"])}}
     )

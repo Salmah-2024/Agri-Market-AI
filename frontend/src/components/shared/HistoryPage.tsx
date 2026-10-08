@@ -13,10 +13,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useAuth } from '@/context/AuthContext'
 import { api } from '@/lib/api'
 import { dateTime, longDate, num, tzs } from '@/lib/format'
+import { useT } from '@/lib/i18n'
+import { sw } from '@/lib/crops'
 import type { PredictionRecord } from '@/lib/types'
 import { useApi } from '@/lib/useApi'
 
 export default function HistoryPage() {
+  const t = useT()
   const { meta } = useAuth()
   const [crop, setCrop] = useState('all')
   const q = crop === 'all' ? '' : `?crop=${encodeURIComponent(crop)}`
@@ -25,20 +28,20 @@ export default function HistoryPage() {
 
   const remove = async (id: string) => {
     await api(`/predictions/${id}`, { method: 'DELETE' })
-    toast.success('Prediction deleted')
+    toast.success(t('Utabiri umefutwa', 'Prediction deleted'))
     reload()
   }
 
   return (
     <>
       <PageHeader
-        title="Prediction history"
-        description="Every prediction you ran, and how close it was once the real prices came in."
+        title={t('Historia ya utabiri', 'Prediction history')}
+        description={t('Kila utabiri uliouendesha, na jinsi ulivyokaribia bei halisi zilipofika.', 'Every prediction you ran, and how close it was once the real prices came in.')}
         action={
           <SimpleSelect
             value={crop}
             onChange={setCrop}
-            options={[{ value: 'all', label: 'All crops' }, ...meta.crops]}
+            options={[{ value: 'all', label: t('Mazao yote', 'All crops') }, ...meta.crops.map((c) => ({ value: c, label: sw(c) }))]}
             className="w-44"
           />
         }
@@ -54,21 +57,21 @@ export default function HistoryPage() {
             <div className="p-4">
               <EmptyState
                 icon={History}
-                title="No predictions yet"
-                text="Go to Predictions and press “New prediction” — each one you run is saved here."
+                title={t('Bado hakuna utabiri', 'No predictions yet')}
+                text={t('Nenda Utabiri na ubofye “Utabiri mpya” — kila unaouendesha huhifadhiwa hapa.', 'Go to Predictions and press “New prediction” — each one you run is saved here.')}
               />
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>When</TableHead>
-                  <TableHead>Crop</TableHead>
-                  <TableHead>Region</TableHead>
-                  <TableHead className="text-right">Price then</TableHead>
-                  <TableHead className="text-right">Predicted (last day)</TableHead>
-                  <TableHead>Trend</TableHead>
-                  <TableHead>Accuracy</TableHead>
+                  <TableHead>{t('Lini', 'When')}</TableHead>
+                  <TableHead>{t('Zao', 'Crop')}</TableHead>
+                  <TableHead>{t('Mkoa', 'Region')}</TableHead>
+                  <TableHead className="text-right">{t('Bei wakati huo', 'Price then')}</TableHead>
+                  <TableHead className="text-right">{t('Ilivyotabiriwa (siku ya mwisho)', 'Predicted (last day)')}</TableHead>
+                  <TableHead>{t('Mwelekeo', 'Trend')}</TableHead>
+                  <TableHead>{t('Usahihi', 'Accuracy')}</TableHead>
                   <TableHead />
                 </TableRow>
               </TableHeader>
@@ -78,7 +81,7 @@ export default function HistoryPage() {
                   return (
                     <TableRow key={h.id} className="cursor-pointer" onClick={() => setView(h)}>
                       <TableCell>{dateTime(h.created_at)}</TableCell>
-                      <TableCell className="font-medium">{h.crop}</TableCell>
+                      <TableCell className="font-medium">{sw(h.crop)}</TableCell>
                       <TableCell>{h.region}</TableCell>
                       <TableCell className="text-right tabular-nums">{num(h.result.current_price)}</TableCell>
                       <TableCell className="text-right tabular-nums">
@@ -89,10 +92,10 @@ export default function HistoryPage() {
                       </TableCell>
                       <TableCell>
                         {h.mean_error_pct == null ? (
-                          <Badge variant="muted">Waiting for real prices</Badge>
+                          <Badge variant="muted">{t('Inasubiri bei halisi', 'Waiting for real prices')}</Badge>
                         ) : (
                           <Badge variant={h.mean_error_pct < 5 ? 'success' : 'warning'}>
-                            ±{h.mean_error_pct}% over {h.accuracy_checked_days}d
+                            {t(`±${h.mean_error_pct}% kwa siku ${h.accuracy_checked_days}`, `±${h.mean_error_pct}% over ${h.accuracy_checked_days}d`)}
                           </Badge>
                         )}
                       </TableCell>
@@ -100,7 +103,7 @@ export default function HistoryPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          aria-label="Delete"
+                          aria-label={t('Futa', 'Delete')}
                           onClick={(e) => {
                             e.stopPropagation()
                             remove(h.id)
@@ -124,18 +127,18 @@ export default function HistoryPage() {
             <>
               <DialogHeader>
                 <DialogTitle>
-                  {view.crop} · {view.region}
+                  {sw(view.crop)} · {view.region}
                 </DialogTitle>
                 <DialogDescription>
-                  Predicted on {dateTime(view.created_at)} · price then {tzs(view.result.current_price)}/kg
+                  {t('Ilitabiriwa tarehe', 'Predicted on')} {dateTime(view.created_at)} · {t('bei wakati huo', 'price then')} {tzs(view.result.current_price)}/kg
                 </DialogDescription>
               </DialogHeader>
               <ForecastChart forecast={view.result} height={240} />
               <ChartLegend />
               {view.result.quantity_kg && (
                 <p className="text-sm">
-                  {num(view.result.quantity_kg)} kg: {tzs(view.result.expected_revenue_today)} that day, best{' '}
-                  {tzs(view.result.expected_revenue_best_day)} on {longDate(view.result.best_day_to_sell.date)}.
+                  {num(view.result.quantity_kg)} kg: {tzs(view.result.expected_revenue_today)} {t('siku hiyo, bora', 'that day, best')}{' '}
+                  {tzs(view.result.expected_revenue_best_day)} {t('tarehe', 'on')} {longDate(view.result.best_day_to_sell.date)}.
                 </p>
               )}
             </>

@@ -3,69 +3,74 @@ import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { ArrowRight, Check, ChevronDown, Menu, ShoppingBasket, Sparkles, Tractor, X } from 'lucide-react'
 
 import { BRAND, LeafMark } from '@/components/brand/Brand'
+import LanguageToggle from '@/components/shared/LanguageToggle'
+import { useT } from '@/lib/i18n'
 import { LOCAL, PHOTOS } from '@/lib/siteImages'
 import { cn } from '@/lib/utils'
 
 export const DARK = '#0B2414'
 
+/** Translation function signature from useT(): t(swahili, english). */
+type T = (sw: string, en: string) => string
+
 /* ------------------------------------------------------------------
    Main navigation (like the reference site): Mwanzo · Soko · Bei na utabiri
 ------------------------------------------------------------------- */
-export const PRIMARY_NAV = [
-  { label: 'Mwanzo', to: '/' },
-  { label: 'Soko', to: '/soko' },
-  { label: 'Bei na utabiri', to: '/bei' },
+export const buildPrimaryNav = (t: T) => [
+  { label: t('Mwanzo', 'Home'), to: '/' },
+  { label: t('Soko', 'Marketplace'), to: '/soko' },
+  { label: t('Bei na utabiri', 'Prices & forecast'), to: '/bei' },
 ]
 
 /* ------------------------------------------------------------------
    Information pages, shown under "Zaidi" (More)
 ------------------------------------------------------------------- */
-export const SITE_NAV = [
+export const buildSiteNav = (t: T) => [
   {
-    label: 'What we offer',
+    label: t('Tunachotoa', 'What we offer'),
     to: '/offer',
     image: PHOTOS.manPhoneField,
-    blurb: 'AI forecasts, a direct marketplace and official prices in one place.',
+    blurb: t('Utabiri wa AI, soko la moja kwa moja na bei rasmi mahali pamoja.', 'AI forecasts, a direct marketplace and official prices in one place.'),
     children: [
-      { label: 'AI price prediction', desc: 'Multi-week forecast per crop and region', to: '/offer#prediction' },
-      { label: 'Direct marketplace', desc: 'List, order and deliver crops', to: '/offer#marketplace' },
-      { label: 'Government prices', desc: 'Compare with bei elekezi', to: '/offer#gov-prices' },
-      { label: 'Prediction history', desc: 'See how accurate forecasts were', to: '/offer#history' },
+      { label: t('Utabiri wa bei wa AI', 'AI price prediction'), desc: t('Utabiri wa wiki kadhaa kwa kila zao na mkoa', 'Multi-week forecast per crop and region'), to: '/offer#prediction' },
+      { label: t('Soko la moja kwa moja', 'Direct marketplace'), desc: t('Orodhesha, agiza na usafirishe mazao', 'List, order and deliver crops'), to: '/offer#marketplace' },
+      { label: t('Bei za serikali', 'Government prices'), desc: t('Linganisha na bei elekezi', 'Compare with bei elekezi'), to: '/offer#gov-prices' },
+      { label: t('Historia ya utabiri', 'Prediction history'), desc: t('Ona jinsi utabiri ulivyokuwa sahihi', 'See how accurate forecasts were'), to: '/offer#history' },
     ],
   },
   {
-    label: 'Who we serve',
+    label: t('Tunaowahudumia', 'Who we serve'),
     to: '/who-we-serve',
     image: PHOTOS.marketTomatoes,
-    blurb: 'Built for the farmers who grow and the buyers who purchase.',
+    blurb: t('Imejengwa kwa ajili ya wakulima wanaolima na wanunuzi wanaonunua.', 'Built for the farmers who grow and the buyers who purchase.'),
     children: [
-      { label: 'Farmers', desc: 'Sell at the right time', to: '/who-we-serve#farmers' },
-      { label: 'Buyers', desc: 'Buy at the right price', to: '/who-we-serve#buyers' },
-      { label: 'Crops we cover', desc: 'All 7 Ministry-bulletin crops', to: '/who-we-serve#crops' },
-      { label: 'Regions', desc: '18 market regions + national', to: '/who-we-serve#regions' },
+      { label: t('Wakulima', 'Farmers'), desc: t('Uza kwa wakati sahihi', 'Sell at the right time'), to: '/who-we-serve#farmers' },
+      { label: t('Wanunuzi', 'Buyers'), desc: t('Nunua kwa bei sahihi', 'Buy at the right price'), to: '/who-we-serve#buyers' },
+      { label: t('Mazao tunayoshughulikia', 'Crops we cover'), desc: t('Mazao yote 7 ya taarifa za Wizara', 'All 7 Ministry-bulletin crops'), to: '/who-we-serve#crops' },
+      { label: t('Mikoa', 'Regions'), desc: t('Mikoa 18 ya masoko + kitaifa', '18 market regions + national'), to: '/who-we-serve#regions' },
     ],
   },
   {
-    label: 'How it works',
+    label: t('Jinsi inavyofanya kazi', 'How it works'),
     to: '/how-it-works',
     image: PHOTOS.womanPlanting,
-    blurb: 'From sign-up to delivered order, step by step.',
+    blurb: t('Kuanzia kujisajili hadi oda kufikishwa, hatua kwa hatua.', 'From sign-up to delivered order, step by step.'),
     children: [
-      { label: 'For farmers', desc: 'Five steps to your first sale', to: '/how-it-works#farmers' },
-      { label: 'For buyers', desc: 'Browse, order, track', to: '/how-it-works#buyers' },
-      { label: 'Order journey', desc: 'Pending → confirmed → delivered', to: '/how-it-works#orders' },
-      { label: 'FAQ', desc: 'Common questions answered', to: '/how-it-works#faq' },
+      { label: t('Kwa wakulima', 'For farmers'), desc: t('Hatua tano hadi mauzo yako ya kwanza', 'Five steps to your first sale'), to: '/how-it-works#farmers' },
+      { label: t('Kwa wanunuzi', 'For buyers'), desc: t('Vinjari, agiza, fuatilia', 'Browse, order, track'), to: '/how-it-works#buyers' },
+      { label: t('Safari ya oda', 'Order journey'), desc: t('Inasubiri → imethibitishwa → imefikishwa', 'Pending → confirmed → delivered'), to: '/how-it-works#orders' },
+      { label: t('Maswali yanayoulizwa mara kwa mara', 'FAQ'), desc: t('Majibu ya maswali ya kawaida', 'Common questions answered'), to: '/how-it-works#faq' },
     ],
   },
   {
-    label: 'Technology',
+    label: t('Teknolojia', 'Technology'),
     to: '/technology',
     image: PHOTOS.analyticsLaptop,
-    blurb: 'The machine learning behind every forecast.',
+    blurb: t('Ujifunzaji wa mashine nyuma ya kila utabiri.', 'The machine learning behind every forecast.'),
     children: [
-      { label: 'How the AI works', desc: 'From prices to predictions', to: '/technology#pipeline' },
-      { label: 'Model accuracy', desc: 'Error per crop vs. a baseline', to: '/technology#accuracy' },
-      { label: 'Tech stack', desc: 'React, Flask, MongoDB, scikit-learn', to: '/technology#stack' },
+      { label: t('Jinsi AI inavyofanya kazi', 'How the AI works'), desc: t('Kuanzia bei hadi utabiri', 'From prices to predictions'), to: '/technology#pipeline' },
+      { label: t('Usahihi wa modeli', 'Model accuracy'), desc: t('Hitilafu kwa kila zao dhidi ya msingi', 'Error per crop vs. a baseline'), to: '/technology#accuracy' },
+      { label: t('Teknolojia zilizotumika', 'Tech stack'), desc: 'React, Flask, MongoDB, scikit-learn', to: '/technology#stack' },
     ],
   },
 ]
@@ -145,8 +150,9 @@ export function Eyebrow({ children, light = false }: { children: ReactNode; ligh
 
 export function BrandMark({ light = false }: { light?: boolean }) {
   const [failed, setFailed] = useState(false)
+  const t = useT()
   return (
-    <Link to="/" className="inline-flex items-center gap-2.5" aria-label="Agri-Market AI home">
+    <Link to="/" className="inline-flex items-center gap-2.5" aria-label={t('Agri-Market AI mwanzo', 'Agri-Market AI home')}>
       <span className="grid size-9 place-items-center overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-black/5">
         {failed ? (
           <LeafMark className="size-6" />
@@ -177,6 +183,7 @@ export function PageHero({
   crumbs: string
   children?: ReactNode
 }) {
+  const t = useT()
   return (
     <section className="relative isolate overflow-hidden text-white">
       <SmartImg src={image} alt="" className="absolute inset-0 -z-20 h-full w-full scale-105" />
@@ -184,7 +191,7 @@ export function PageHero({
       <div className="mx-auto max-w-7xl px-5 pt-16 pb-20 md:px-8 lg:pt-24 lg:pb-28">
         <nav aria-label="Breadcrumb" className="mb-6 text-sm text-white/60">
           <Link to="/" className="hover:text-white">
-            Home
+            {t('Mwanzo', 'Home')}
           </Link>{' '}
           / <span className="text-white/90">{crumbs}</span>
         </nav>
@@ -231,6 +238,7 @@ export function PrimaryLink({ to, children, light = false }: { to: string; child
 
 /** Photo-backed call-to-action band used at the bottom of every page. */
 export function CtaBand({ image = LOCAL.soil, title, text }: { image?: string; title?: ReactNode; text?: string }) {
+  const t = useT()
   return (
     <section className="px-5 py-20 md:px-8">
       <Reveal>
@@ -240,23 +248,23 @@ export function CtaBand({ image = LOCAL.soil, title, text }: { image?: string; t
           <h2 className="mx-auto max-w-3xl text-3xl font-extrabold tracking-tight sm:text-5xl">
             {title ?? (
               <>
-                Sell at the right time. <span className="text-[#B8E07A]">Buy at the right price.</span>
+                {t('Uza kwa wakati sahihi.', 'Sell at the right time.')} <span className="text-[#B8E07A]">{t('Nunua kwa bei sahihi.', 'Buy at the right price.')}</span>
               </>
             )}
           </h2>
-          <p className="mx-auto mt-5 max-w-xl text-lg text-white/80">{text ?? 'Create your account in less than two minutes.'}</p>
+          <p className="mx-auto mt-5 max-w-xl text-lg text-white/80">{text ?? t('Fungua akaunti yako kwa chini ya dakika mbili.', 'Create your account in less than two minutes.')}</p>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               to="/register?role=farmer"
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 text-sm font-semibold text-[#1E5631] shadow-xl transition hover:-translate-y-0.5"
             >
-              <Tractor className="size-4" /> Register as farmer
+              <Tractor className="size-4" /> {t('Jisajili kama mkulima', 'Register as farmer')}
             </Link>
             <Link
               to="/register?role=buyer"
               className="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-white/40 px-7 py-4 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-white/10"
             >
-              <ShoppingBasket className="size-4" /> Register as buyer
+              <ShoppingBasket className="size-4" /> {t('Jisajili kama mnunuzi', 'Register as buyer')}
             </Link>
           </div>
         </div>
@@ -269,6 +277,9 @@ export function CtaBand({ image = LOCAL.soil, title, text }: { image?: string; t
    Header with mega-menu
 ------------------------------------------------------------------- */
 function Header() {
+  const t = useT()
+  const PRIMARY_NAV = buildPrimaryNav(t)
+  const SITE_NAV = buildSiteNav(t)
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [expanded, setExpanded] = useState<string | null>(null)
@@ -317,7 +328,7 @@ function Header() {
           {/* "Zaidi" mega-menu with the information pages */}
           <div className="group relative">
             <button className="inline-flex items-center gap-1 rounded-lg px-3.5 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 hover:text-[#1E5631]">
-              Zaidi
+              {t('Zaidi', 'More')}
               <ChevronDown className="size-3.5 text-gray-400 transition-transform group-hover:rotate-180" />
             </button>
             <div className="invisible absolute top-full right-0 w-[640px] pt-3 opacity-0 transition-all duration-200 group-focus-within:visible group-focus-within:opacity-100 group-hover:visible group-hover:opacity-100">
@@ -337,26 +348,30 @@ function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
+          <LanguageToggle />
           <Link to="/login" className="rounded-lg px-4 py-2 text-sm font-semibold text-gray-800 hover:text-[#1E5631]">
-            Ingia
+            {t('Ingia', 'Sign in')}
           </Link>
           <Link
             to="/register"
             className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-[#1E5631]/25 transition hover:brightness-110"
             style={{ background: BRAND.green }}
           >
-            Jisajili <ArrowRight className="size-4" />
+            {t('Jisajili', 'Get started')} <ArrowRight className="size-4" />
           </Link>
         </div>
 
-        <button
-          className="grid size-10 place-items-center rounded-lg text-gray-700 hover:bg-gray-100 lg:hidden"
-          onClick={() => setOpen((o) => !o)}
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-        >
-          {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <LanguageToggle />
+          <button
+            className="grid size-10 place-items-center rounded-lg text-gray-700 hover:bg-gray-100"
+            onClick={() => setOpen((o) => !o)}
+            aria-label={open ? t('Funga menyu', 'Close menu') : t('Fungua menyu', 'Open menu')}
+            aria-expanded={open}
+          >
+            {open ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
+        </div>
       </div>
 
       {/* mobile menu */}
@@ -374,7 +389,7 @@ function Header() {
               {item.label}
             </NavLink>
           ))}
-          <p className="pt-5 pb-1 text-xs font-semibold tracking-wider text-gray-400 uppercase">Zaidi</p>
+          <p className="pt-5 pb-1 text-xs font-semibold tracking-wider text-gray-400 uppercase">{t('Zaidi', 'More')}</p>
           {SITE_NAV.map((item) => (
             <div key={item.to} className="border-b border-gray-100">
               <button
@@ -389,7 +404,7 @@ function Header() {
                 <ul className="grid gap-1 pb-3">
                   <li>
                     <Link to={item.to} className="block rounded-lg px-3 py-2 text-sm font-medium text-[#1E5631]">
-                      Overview
+                      {t('Muhtasari', 'Overview')}
                     </Link>
                   </li>
                   {item.children.map((c) => (
@@ -405,10 +420,10 @@ function Header() {
           ))}
           <div className="mt-5 grid grid-cols-2 gap-3">
             <Link to="/login" className="rounded-lg border border-gray-200 py-2.5 text-center text-sm font-semibold">
-              Ingia
+              {t('Ingia', 'Sign in')}
             </Link>
             <Link to="/register" className="rounded-lg py-2.5 text-center text-sm font-semibold text-white" style={{ background: BRAND.green }}>
-              Jisajili
+              {t('Jisajili', 'Get started')}
             </Link>
           </div>
         </div>
@@ -421,13 +436,16 @@ function Header() {
    Footer
 ------------------------------------------------------------------- */
 function Footer() {
+  const t = useT()
+  const PRIMARY_NAV = buildPrimaryNav(t)
+  const SITE_NAV = buildSiteNav(t)
   return (
     <footer className="text-white" style={{ background: DARK }}>
       <div className="mx-auto grid max-w-7xl gap-12 px-5 pt-16 pb-10 md:px-8 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1.1fr]">
         <div>
           <BrandMark light />
           <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/60">
-            Soko la mazao lenye maamuzi yanayoongozwa na taarifa. Mahindi · Mchele · Tanzania.
+            {t('Soko la mazao linaloongozwa na takwimu za bei. Mazao 7 ya Wizara · Tanzania.', 'A crop market driven by real price data. 7 Ministry crops · Tanzania.')}
           </p>
           <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold">
             {PRIMARY_NAV.map((n) => (
@@ -457,7 +475,7 @@ function Footer() {
         ))}
         <div>
           <Link to="/technology" className="text-sm font-semibold hover:text-[#B8E07A]">
-            Technology
+            {t('Teknolojia', 'Technology')}
           </Link>
           <ul className="mt-4 grid gap-2.5 text-sm text-white/60">
             {SITE_NAV[3].children.map((c) => (
@@ -472,9 +490,9 @@ function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-6 text-xs text-white/50 sm:flex-row sm:items-center sm:justify-between md:px-8">
-          <p>© {new Date().getFullYear()} Agri-Market AI. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Agri-Market AI. {t('Haki zote zimehifadhiwa.', 'All rights reserved.')}</p>
           <p>
-            Stock photos from{' '}
+            {t('Picha za hifadhi kutoka', 'Stock photos from')}{' '}
             <a href="https://unsplash.com" target="_blank" rel="noreferrer" className="underline hover:text-white">
               Unsplash
             </a>
@@ -489,6 +507,7 @@ function Footer() {
    Layout: announcement + header + page + footer
 ------------------------------------------------------------------- */
 export default function SiteLayout() {
+  const t = useT()
   const { pathname, hash } = useLocation()
 
   // go to the top on a new page, or to the section named in the #hash
@@ -513,10 +532,10 @@ export default function SiteLayout() {
 
       <div className="bg-[#0B2414] text-white">
         <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-5 py-2 text-center text-xs sm:text-sm">
-          <span className="rounded-full bg-[#8DC63F] px-2 py-0.5 text-[10px] font-bold tracking-wide text-[#0B2414] uppercase">Mpya</span>
-          <span className="text-white/85">Utabiri wa bei wa wiki kadhaa kwa mazao yote 7 — unasasishwa kila siku.</span>
+          <span className="rounded-full bg-[#8DC63F] px-2 py-0.5 text-[10px] font-bold tracking-wide text-[#0B2414] uppercase">{t('Mpya', 'New')}</span>
+          <span className="text-white/85">{t('Utabiri wa bei wa wiki kadhaa kwa mazao yote 7 — unasasishwa kila siku.', 'Multi-week price forecasts for all 7 crops — updated every day.')}</span>
           <Link to="/bei" className="hidden items-center gap-1 font-semibold text-[#B8E07A] hover:underline sm:inline-flex">
-            Angalia bei <ArrowRight className="size-3.5" />
+            {t('Angalia bei', 'View prices')} <ArrowRight className="size-3.5" />
           </Link>
         </div>
       </div>

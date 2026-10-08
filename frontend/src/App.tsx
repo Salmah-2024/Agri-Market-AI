@@ -40,24 +40,24 @@ import { BuyerTransport, FarmerShipments } from '@/pages/transport/TransportPage
 import type { Role } from '@/lib/types'
 
 const FARMER_NAV: NavItem[] = [
-  { to: '/farmer', label: 'Overview', icon: LayoutDashboard, end: true },
-  { to: '/farmer/crops', label: 'My crops', icon: Sprout },
-  { to: '/farmer/orders', label: 'Orders', icon: Receipt },
-  { to: '/farmer/buyers', label: 'Buyers', icon: Users },
-  { to: '/farmer/shipments', label: 'Shipments', icon: Truck },
-  { to: '/farmer/predictions', label: 'Sales predictions', icon: BrainCircuit },
-  { to: '/farmer/history', label: 'Prediction history', icon: History },
-  { to: '/farmer/gov-prices', label: 'Government prices', icon: Landmark },
-  { to: '/farmer/profile', label: 'Profile', icon: User },
-  { to: '/farmer/settings', label: 'Settings', icon: Settings },
+  { to: '/farmer', label: 'Muhtasari', labelEn: 'Overview', icon: LayoutDashboard, end: true },
+  { to: '/farmer/crops', label: 'Mazao yangu', labelEn: 'My crops', icon: Sprout },
+  { to: '/farmer/orders', label: 'Maagizo', labelEn: 'Orders', icon: Receipt },
+  { to: '/farmer/buyers', label: 'Wanunuzi', labelEn: 'Buyers', icon: Users },
+  { to: '/farmer/shipments', label: 'Usafirishaji', labelEn: 'Shipments', icon: Truck },
+  { to: '/farmer/predictions', label: 'Utabiri wa mauzo', labelEn: 'Sales predictions', icon: BrainCircuit },
+  { to: '/farmer/history', label: 'Historia ya utabiri', labelEn: 'Prediction history', icon: History },
+  { to: '/farmer/gov-prices', label: 'Bei za serikali', labelEn: 'Government prices', icon: Landmark },
+  { to: '/farmer/profile', label: 'Wasifu', labelEn: 'Profile', icon: User },
+  { to: '/farmer/settings', label: 'Mipangilio', labelEn: 'Settings', icon: Settings },
 ]
 
 const ADMIN_NAV: NavItem[] = [
-  { to: '/admin', label: 'Overview', icon: LayoutDashboard, end: true },
-  { to: '/admin/gov-prices', label: 'Government prices', icon: Landmark },
-  { to: '/admin/users', label: 'Users', icon: Users },
-  { to: '/admin/profile', label: 'Profile', icon: User },
-  { to: '/admin/settings', label: 'Settings', icon: Settings },
+  { to: '/admin', label: 'Muhtasari', labelEn: 'Overview', icon: LayoutDashboard, end: true },
+  { to: '/admin/gov-prices', label: 'Bei za serikali', labelEn: 'Government prices', icon: Landmark },
+  { to: '/admin/users', label: 'Watumiaji', labelEn: 'Users', icon: Users },
+  { to: '/admin/profile', label: 'Wasifu', labelEn: 'Profile', icon: User },
+  { to: '/admin/settings', label: 'Mipangilio', labelEn: 'Settings', icon: Settings },
 ]
 
 function Protected({ role, children }: { role: Role; children: ReactNode }) {
@@ -76,15 +76,15 @@ function Protected({ role, children }: { role: Role; children: ReactNode }) {
 function BuyerLayout() {
   const { count } = useCart()
   const nav: NavItem[] = [
-    { to: '/buyer', label: 'Available crops', icon: ShoppingBasket, end: true },
-    { to: '/buyer/cart', label: 'Cart', icon: ShoppingCart, badge: count },
-    { to: '/buyer/orders', label: 'My orders', icon: Receipt },
-    { to: '/buyer/transport', label: 'Transport', icon: Truck },
-    { to: '/buyer/predictions', label: 'AI predictions', icon: BrainCircuit },
-    { to: '/buyer/history', label: 'Prediction history', icon: History },
-    { to: '/buyer/gov-prices', label: 'Government prices', icon: Landmark },
-    { to: '/buyer/profile', label: 'Profile', icon: User },
-    { to: '/buyer/settings', label: 'Settings', icon: Settings },
+    { to: '/buyer', label: 'Mazao yaliyopo', labelEn: 'Available crops', icon: ShoppingBasket, end: true },
+    { to: '/buyer/cart', label: 'Kikapu', labelEn: 'Cart', icon: ShoppingCart, badge: count },
+    { to: '/buyer/orders', label: 'Maagizo yangu', labelEn: 'My orders', icon: Receipt },
+    { to: '/buyer/transport', label: 'Usafirishaji', labelEn: 'Transport', icon: Truck },
+    { to: '/buyer/predictions', label: 'Utabiri wa AI', labelEn: 'AI predictions', icon: BrainCircuit },
+    { to: '/buyer/history', label: 'Historia ya utabiri', labelEn: 'Prediction history', icon: History },
+    { to: '/buyer/gov-prices', label: 'Bei za serikali', labelEn: 'Government prices', icon: Landmark },
+    { to: '/buyer/profile', label: 'Wasifu', labelEn: 'Profile', icon: User },
+    { to: '/buyer/settings', label: 'Mipangilio', labelEn: 'Settings', icon: Settings },
   ]
   return <DashboardLayout items={nav} basePath="/buyer" />
 }

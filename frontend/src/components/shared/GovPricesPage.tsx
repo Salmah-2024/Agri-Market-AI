@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useAuth } from '@/context/AuthContext'
 import { longDate, shortDate, unitPrice } from '@/lib/format'
+import { useT } from '@/lib/i18n'
 import type { GovPrice } from '@/lib/types'
 import { useApi } from '@/lib/useApi'
 
@@ -20,6 +21,7 @@ interface Row {
 }
 
 export default function GovPricesPage() {
+  const t = useT()
   const { user, meta } = useAuth()
   const [region, setRegion] = useState(user?.settings.market_region ?? 'National')
   const { data, loading, error } = useApi<{ region: string; prices: Row[] }>(`/gov-prices?region=${encodeURIComponent(region)}`)
@@ -29,8 +31,8 @@ export default function GovPricesPage() {
   return (
     <>
       <PageHeader
-        title="Government indicative prices"
-        description="Bei elekezi — official wholesale prices from the Ministry of Agriculture, next to today’s market estimate."
+        title={t('Bei elekezi za serikali', 'Government indicative prices')}
+        description={t('Bei elekezi — bei rasmi za jumla kutoka Wizara ya Kilimo, sambamba na makadirio ya soko ya leo.', 'Bei elekezi — official wholesale prices from the Ministry of Agriculture, next to today’s market estimate.')}
         action={<SimpleSelect value={region} onChange={setRegion} options={meta.market_regions} className="w-44" />}
       />
       {error && <ErrorBox message={error} />}
@@ -40,7 +42,7 @@ export default function GovPricesPage() {
             <Landmark className="size-5 text-primary" /> {region} · {longDate(new Date().toISOString().slice(0, 10))}
           </CardTitle>
           <CardDescription>
-            Where the Ministry has no price for this region, the national average is shown.
+            {t('Pale Wizara haina bei kwa mkoa huu, wastani wa kitaifa unaoneshwa.', 'Where the Ministry has no price for this region, the national average is shown.')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -50,13 +52,13 @@ export default function GovPricesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Crop</TableHead>
-                  <TableHead className="text-right">Official price</TableHead>
-                  <TableHead>Applies to</TableHead>
-                  <TableHead>Published</TableHead>
-                  <TableHead className="text-right">Market today (est.)</TableHead>
-                  <TableHead className="text-right">AI next week</TableHead>
-                  <TableHead>Trend</TableHead>
+                  <TableHead>{t('Zao', 'Crop')}</TableHead>
+                  <TableHead className="text-right">{t('Bei rasmi', 'Official price')}</TableHead>
+                  <TableHead>{t('Inahusu', 'Applies to')}</TableHead>
+                  <TableHead>{t('Ilichapishwa', 'Published')}</TableHead>
+                  <TableHead className="text-right">{t('Soko leo (makadirio)', 'Market today (est.)')}</TableHead>
+                  <TableHead className="text-right">{t('AI wiki ijayo', 'AI next week')}</TableHead>
+                  <TableHead>{t('Mwelekeo', 'Trend')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -76,7 +78,7 @@ export default function GovPricesPage() {
                         <span className={p.official.days_old > 14 ? 'text-amber-600' : ''}>
                           {shortDate(p.official.date)}
                           {p.official.days_old > 0 && (
-                            <span className="text-xs text-muted-foreground"> ({p.official.days_old}d ago)</span>
+                            <span className="text-xs text-muted-foreground"> {t(`(siku ${p.official.days_old} zilizopita)`, `(${p.official.days_old}d ago)`)}</span>
                           )}
                         </span>
                       )}
@@ -94,11 +96,10 @@ export default function GovPricesPage() {
           <div className="mt-4 flex gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
             <Info className="mt-0.5 size-4 shrink-0" />
             <div>
-              <p>Source: {sources.join('; ') || '—'}.</p>
+              <p>{t('Chanzo', 'Source')}: {sources.join('; ') || '—'}.</p>
               <p className="mt-1">
-                Official prices are updated whenever the Ministry publishes a new bulletin (the admin adds them, or they are imported
-                automatically every day at 00:05 EAT when a price feed is configured).
-                {latest && <> Latest published: {longDate(latest)}.</>}
+                {t('Bei rasmi husasishwa kila Wizara inapochapisha taarifa mpya (msimamizi anaziongeza, au zinaingizwa kiotomatiki kila siku saa 6:05 usiku EAT pale mlisho wa bei umewekwa).', 'Official prices are updated whenever the Ministry publishes a new bulletin (the admin adds them, or they are imported automatically every day at 00:05 EAT when a price feed is configured).')}
+                {latest && <> {t(`Iliyochapishwa karibuni: ${longDate(latest)}.`, `Latest published: ${longDate(latest)}.`)}</>}
               </p>
             </div>
           </div>

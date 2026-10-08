@@ -35,7 +35,7 @@ def _validate_listing(data: dict, partial: bool = False) -> tuple[dict, dict]:
             doc[f] = data[f]
     if not partial or "crop" in doc:
         if doc.get("crop") not in CROPS:
-            errors["crop"] = "Select a crop."
+            errors["crop"] = "Chagua zao."
     for f in ("quantity_kg", "price_per_kg"):
         if not partial or f in doc:
             try:
@@ -43,14 +43,14 @@ def _validate_listing(data: dict, partial: bool = False) -> tuple[dict, dict]:
                 if doc[f] <= 0:
                     raise ValueError
             except (KeyError, ValueError, TypeError):
-                errors[f] = "Enter a number greater than 0."
+                errors[f] = "Weka namba kubwa kuliko 0."
     if "min_order_kg" in doc:
         try:
             doc["min_order_kg"] = float(doc["min_order_kg"])
         except (ValueError, TypeError):
-            errors["min_order_kg"] = "Enter a number."
+            errors["min_order_kg"] = "Weka namba."
     if not partial and not doc.get("region"):
-        errors["region"] = "Select the region where the crop is."
+        errors["region"] = "Chagua mkoa ambako zao lipo."
     return doc, errors
 
 
@@ -60,7 +60,7 @@ def _validate_listing(data: dict, partial: bool = False) -> tuple[dict, dict]:
 def create_listing():
     doc, errors = _validate_listing(request.get_json(silent=True) or {})
     if errors:
-        return jsonify(error="Please fix the highlighted fields.", fields=errors), 400
+        return jsonify(error="Tafadhali rekebisha sehemu zilizoangaziwa.", fields=errors), 400
     doc.update({
         "farmer_id": g.user["_id"],
         "farmer_name": g.user.get("full_name"),
@@ -91,15 +91,15 @@ def update_listing(lid):
     db = get_db()
     doc = db.listings.find_one({"_id": oid(lid), "farmer_id": g.user["_id"]})
     if not doc:
-        return jsonify(error="Listing not found."), 404
+        return jsonify(error="Tangazo halikupatikana."), 404
     data = request.get_json(silent=True) or {}
     updates, errors = _validate_listing(data, partial=True)
     if errors:
-        return jsonify(error="Please fix the highlighted fields.", fields=errors), 400
+        return jsonify(error="Tafadhali rekebisha sehemu zilizoangaziwa.", fields=errors), 400
     if "quantity_kg" in updates:
         sold = doc["quantity_kg"] - doc["quantity_available_kg"]
         if updates["quantity_kg"] < sold:
-            return jsonify(error=f"You already sold {sold:g} kg."), 400
+            return jsonify(error=f"Tayari umeuza kg {sold:g}."), 400
         updates["quantity_available_kg"] = updates["quantity_kg"] - sold
     status = data.get("status")
     if status in ("available", "sold", "withdrawn"):
@@ -119,7 +119,7 @@ def delete_listing(lid):
     db = get_db()
     doc = db.listings.find_one({"_id": oid(lid), "farmer_id": g.user["_id"]})
     if not doc:
-        return jsonify(error="Listing not found."), 404
+        return jsonify(error="Tangazo halikupatikana."), 404
     if db.orders.count_documents({"listing_id": doc["_id"]}):
         db.listings.update_one({"_id": doc["_id"]}, {"$set": {"status": "withdrawn"}})
     else:
@@ -159,13 +159,13 @@ def farmer_orders():
 def set_order_status(order_id):
     status = (request.get_json(silent=True) or {}).get("status")
     if status not in ("confirmed", "delivered", "cancelled"):
-        return jsonify(error="Invalid status."), 400
+        return jsonify(error="Hali si sahihi."), 400
     db = get_db()
     order = db.orders.find_one({"_id": oid(order_id), "farmer_id": g.user["_id"]})
     if not order:
-        return jsonify(error="Order not found."), 404
+        return jsonify(error="Agizo halikupatikana."), 404
     if order["status"] == "cancelled":
-        return jsonify(error="Order already cancelled."), 400
+        return jsonify(error="Agizo tayari limeghairiwa."), 400
     if status == "cancelled":  # return quantity to listing
         listing = db.listings.find_one({"_id": order["listing_id"]})
         if listing:
@@ -212,9 +212,9 @@ def get_cart():
         item["subtotal"] = round(c["quantity_kg"] * listing["price_per_kg"], 0)
         item["problem"] = None
         if listing["status"] not in ("available", "partially_sold"):
-            item["problem"] = "No longer available"
+            item["problem"] = "Haipatikani tena"
         elif c["quantity_kg"] > listing["quantity_available_kg"]:
-            item["problem"] = f"Only {listing['quantity_available_kg']:g} kg left"
+            item["problem"] = f"Zimebaki kg {listing['quantity_available_kg']:g} tu"
         items.append(item)
     total = sum(i["subtotal"] for i in items if not i["problem"])
     return jsonify(items=items, total=total, count=len(items))
@@ -227,15 +227,15 @@ def add_to_cart():
     db = get_db()
     listing = db.listings.find_one({"_id": oid(data.get("listing_id"))})
     if not listing or listing["status"] not in ("available", "partially_sold"):
-        return jsonify(error="This crop is no longer available."), 404
+        return jsonify(error="Zao hili halipatikani tena."), 404
     try:
         qty = float(data.get("quantity_kg"))
     except (TypeError, ValueError):
-        return jsonify(error="Enter the quantity in kg."), 400
+        return jsonify(error="Weka kiasi kwa kg."), 400
     if qty <= 0 or qty > listing["quantity_available_kg"]:
-        return jsonify(error=f"Quantity must be between 1 and {listing['quantity_available_kg']:g} kg."), 400
+        return jsonify(error=f"Kiasi lazima kiwe kati ya 1 na kg {listing['quantity_available_kg']:g}."), 400
     if listing.get("min_order_kg") and qty < listing["min_order_kg"]:
-        return jsonify(error=f"Minimum order is {listing['min_order_kg']:g} kg."), 400
+        return jsonify(error=f"Agizo la chini ni kg {listing['min_order_kg']:g}."), 400
     db.cart_items.update_one(
         {"buyer_id": g.user["_id"], "listing_id": listing["_id"]},
         {"$set": {"quantity_kg": qty, "added_at": datetime.utcnow()}},
@@ -251,14 +251,14 @@ def update_cart_item(item_id):
     db = get_db()
     item = db.cart_items.find_one({"_id": oid(item_id), "buyer_id": g.user["_id"]})
     if not item:
-        return jsonify(error="Item not in cart."), 404
+        return jsonify(error="Bidhaa haipo kikapuni."), 404
     listing = db.listings.find_one({"_id": item["listing_id"]})
     try:
         qty = float(data.get("quantity_kg"))
     except (TypeError, ValueError):
-        return jsonify(error="Enter the quantity in kg."), 400
+        return jsonify(error="Weka kiasi kwa kg."), 400
     if qty <= 0 or (listing and qty > listing["quantity_available_kg"]):
-        return jsonify(error="Quantity not available."), 400
+        return jsonify(error="Kiasi hakipatikani."), 400
     db.cart_items.update_one({"_id": item["_id"]}, {"$set": {"quantity_kg": qty}})
     return get_cart()
 
@@ -277,7 +277,7 @@ def checkout():
     data = request.get_json(silent=True) or {}
     items = list(db.cart_items.find({"buyer_id": g.user["_id"]}))
     if not items:
-        return jsonify(error="Your cart is empty."), 400
+        return jsonify(error="Kikapu chako hakina kitu."), 400
     orders, skipped = [], []
     for c in items:
         listing = db.listings.find_one({"_id": c["listing_id"]})
@@ -316,7 +316,7 @@ def checkout():
         db.cart_items.delete_one({"_id": c["_id"]})
         orders.append(clean(order))
     if not orders:
-        return jsonify(error="None of the items could be ordered - check availability.", skipped=skipped), 409
+        return jsonify(error="Hakuna bidhaa iliyoweza kuagizwa - angalia upatikanaji.", skipped=skipped), 409
     return jsonify(orders=orders, skipped=skipped), 201
 
 
